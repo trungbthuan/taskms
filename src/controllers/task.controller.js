@@ -1,6 +1,18 @@
 import taskService from "../services/task.service.js";
 import { prisma } from "../config/prisma.js";
 
+export const getHome = async (req, res) => {
+    try {
+        res.render("../views/home", {
+            title: "Trang chủ",
+            user: req.user,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+};
+
 export const createTask = async (req, res) => {
     try {
         const task = await taskService.createTask(req.body);

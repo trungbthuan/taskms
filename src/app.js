@@ -6,6 +6,7 @@ import employeeRoutes from "./routes/employee.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
+import { title } from "process";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -26,6 +27,9 @@ app.set("layout", "layouts/main"); // ← Layout chính
 app.use("/api/tasks", taskRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
-employeeRoutes;
+//employeeRoutes;
+app.get("/home", (req, res) => {
+    res.render("./home");
+});
 
 export default app;

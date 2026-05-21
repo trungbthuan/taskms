@@ -1,11 +1,14 @@
 import express from "express";
 import { authenticate, authorizeAdmin } from "../middlewares/auth.middleware.js";
-import { createTask, updateProgress, evaluateTask, getEmployeeReport, getTask, getUpdateProgress, getTaskList, getDashboard, getTaskDetail, deleteTask, getTaskEdit, updateTask, getJobNew, createJob } from "../controllers/task.controller.js";
+import { createTask, updateProgress, evaluateTask, getEmployeeReport, getTask, getUpdateProgress, getTaskList, getDashboard, getTaskDetail, deleteTask, getTaskEdit, updateTask, getJobNew, createJob, getHome } from "../controllers/task.controller.js";
 
 const router = express.Router();
 
 //lấy danh sách công việc của nhân viên
 router.get("/list", authenticate, getTaskList);
+
+// Trang chủ
+router.get("/home", getHome);
 
 // Giao việc
 router.get("/new", authenticate, getTask);
