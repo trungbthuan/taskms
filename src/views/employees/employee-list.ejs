@@ -190,9 +190,20 @@
 
   <div class="main">
     <div class="topbar" style="justify-content:space-between">
-      <div>
-        <div class="page-title">Quản lý nhân sự</div>
-        <div class="breadcrumb">Nhân sự / Danh sách</div>
+      <div style="display:flex; align-items:center; gap:10px">
+
+        <!-- Nút hamburger — chỉ hiện trên mobile -->
+        <button class="hamburger-btn sb-toggle" onclick="openSidebar()"
+          style="display:none; width:34px; height:34px; border-radius:8px;
+                border:1px solid #E2E8F0; background:#fff; color:#334155;
+                align-items:center; justify-content:center; cursor:pointer; font-size:18px">
+          <i class="ti ti-menu-2"></i>
+        </button>
+
+        <div>
+          <div class="page-title">Quản lý nhân sự</div>
+          <div class="breadcrumb">Nhân sự / Danh sách</div>
+        </div>
       </div>
       <button class="btn-add" onclick="openModal()">
         <i class="ti ti-user-plus"></i> Thêm nhân viên

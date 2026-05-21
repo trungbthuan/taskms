@@ -171,7 +171,16 @@
 
   <div class="main">
     <div class="topbar" style="justify-content:space-between">
-      <div>
+      <div style="display:flex; align-items:center; gap:10px">
+
+        <!-- Nút hamburger — chỉ hiện trên mobile -->
+        <button class="hamburger-btn sb-toggle" onclick="openSidebar()"
+          style="display:none; width:34px; height:34px; border-radius:8px;
+                border:1px solid #E2E8F0; background:#fff; color:#334155;
+                align-items:center; justify-content:center; cursor:pointer; font-size:18px">
+          <i class="ti ti-menu-2"></i>
+        </button>
+
         <div class="page-title"><h1>Dashboard</h1></div>
         <div class="breadcrumb">Trang chủ / Tổng quan</div>
       </div>
@@ -181,7 +190,12 @@
         <button class="topbar-btn" title="Tùy chọn"><i class="ti ti-dots"></i></button>
       </div>
     </div>
-
+    <!-- Actions bên phải -->
+    <div style="display:flex; align-items:center; gap:8px">
+      <button class="topbar-btn" onclick="location.reload()">
+        <i class="ti ti-refresh"></i>
+      </button>
+    </div>
     <div class="content">
 
       <!-- ── Stat cards ── -->

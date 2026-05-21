@@ -1,8 +1,5 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 
-<!-- Overlay mobile -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
 <aside class="sidebar open" id="sb">
     <div class="sb-header">
         <button class="sb-toggle" onclick="toggleSB()">
@@ -21,6 +18,18 @@
         <div class="divider"></div>
         <div class="nav-section">QUẢN LÝ</div>
 
+        <button class="nav-item" onclick="toggleSub('category-sub', 'category-chev')">
+            <span class="nav-icon"><i class="ti ti-checklist"></i></span>
+            <span class="nav-label">Tạo danh mục</span>
+            <span class="nav-badge">3</span>
+            <i class="ti ti-chevron-down chevron" id="category-chev"></i>
+        </button>
+        <div class="submenu <%= page === 'categories' ? 'show' : '' %>" id="category-sub">
+            <a href="#" class="sub-item">Danh mục nhân viên</a>
+            <a href="/api/tasks/new-job" class="sub-item <%= page === 'jobs' ? 'active' : '' %>">Danh mục công việc</a>
+            <a href="#" class="sub-item">Danh mục tào lao</a>
+        </div>
+
         <button class="nav-item" onclick="toggleSub('task-sub', 'task-chev')">
             <span class="nav-icon"><i class="ti ti-checklist"></i></span>
             <span class="nav-label">Công việc</span>
@@ -30,8 +39,8 @@
         <div class="submenu <%= page === 'tasks' ? 'show' : '' %>" id="task-sub">
             <a href="/api/tasks/new" class="sub-item">Giao việc mới</a>
             <a href="/api/tasks/list" class="sub-item <%= page === 'tasks' ? 'active' : '' %>">Danh sách công việc</a>
+            <a href="/api/tasks/id:progress" class="sub-item" style="pointer-events: none">Cập nhật tiến độ</a>
             <a href="/api/tasks?status=stuck" class="sub-item">Việc vướng mắc</a>
-            <a href="/api/tasks/progress" class="sub-item">Cập nhật tiến độ</a>
             <a href="/api/tasks/review" class="sub-item">Đánh giá & nghiệm thu</a>
         </div>
 
@@ -41,8 +50,8 @@
             <i class="ti ti-chevron-down chevron" id="team-chev"></i>
         </button>
         <div class="submenu" id="team-sub">
-            <a href="/api/employees/list" class="sub-item <%= page === 'employees' ? 'active' : '' %>">Danh sách nhân viên</a>
-            <a href="/api/employees/assign" class="sub-item">Phân công</a>
+            <a href="/api/employees/list" class="sub-item <%= page === 'employees' ? 'active' : '' %>"> Danh sách nhân viên </a>
+            <a href="/api/employees/assign" class="sub-item">Thêm nhân viên mới</a>
         </div>
 
         <div class="divider"></div>
@@ -50,15 +59,19 @@
 
         <a href="/api/auth/test" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
             <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
+            <span class="nav-label">Test</span>
+        </a>
+        <a href="/stats" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
+            <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
             <span class="nav-label">Thống kê</span>
         </a>
-        <a href="/api/tasks/test" class="nav-item">
+        <a href="/reports" class="nav-item">
             <span class="nav-icon"><i class="ti ti-file-analytics"></i></span>
             <span class="nav-label">Báo cáo</span>
         </a>
 
         <div class="divider"></div>
-        <a href="/api/tasks/settings" class="nav-item">
+        <a href="/settings" class="nav-item">
             <span class="nav-icon"><i class="ti ti-settings"></i></span>
             <span class="nav-label">Cài đặt</span>
         </a>
@@ -79,49 +92,21 @@
 </aside>
 
 <script>
-    const isMobile = () => window.innerWidth <= 768;
-
-    // ── Toggle sidebar desktop ──────────────────
     function toggleSB() {
         const sb = document.getElementById("sb");
-        if (isMobile()) {
-            openSidebar();
-        } else {
-            sb.classList.toggle("open");
-            if (!sb.classList.contains("open")) {
-                document.querySelectorAll(".submenu").forEach((m) => m.classList.remove("show"));
-                document.querySelectorAll(".chevron").forEach((c) => c.classList.remove("rotated"));
-            }
+        sb.classList.toggle("open");
+        if (!sb.classList.contains("open")) {
+            document.querySelectorAll(".submenu").forEach((m) => m.classList.remove("show"));
+            document.querySelectorAll(".chevron").forEach((c) => c.classList.remove("rotated"));
         }
     }
-
-    // ── Mobile: mở/đóng sidebar ────────────────
-    function openSidebar() {
-        document.getElementById("sb").classList.add("mobile-open");
-        document.getElementById("sidebarOverlay").classList.add("show");
-        document.body.style.overflow = "hidden"; // chặn scroll trang
-    }
-
-    function closeSidebar() {
-        document.getElementById("sb").classList.remove("mobile-open");
-        document.getElementById("sidebarOverlay").classList.remove("show");
-        document.body.style.overflow = "";
-    }
-
-    // ── Submenu ─────────────────────────────────
     function toggleSub(menuId, chevId) {
         const sb = document.getElementById("sb");
-        // Desktop: sidebar phải mở mới cho toggle submenu
-        if (!isMobile() && !sb.classList.contains("open")) {
+        if (!sb.classList.contains("open")) {
             sb.classList.add("open");
             return;
         }
         document.getElementById(menuId).classList.toggle("show");
         document.getElementById(chevId).classList.toggle("rotated");
     }
-
-    // ── Đóng sidebar khi resize lên desktop ────
-    window.addEventListener("resize", () => {
-        if (!isMobile()) closeSidebar();
-    });
 </script>

@@ -381,3 +381,178 @@ body {
     padding: 24px;
     overflow-y: auto;
 }
+
+/* ══════════════════════════════════
+   RESPONSIVE — MOBILE
+   Breakpoint: < 768px
+══════════════════════════════════ */
+@media (max-width: 768px) {
+    /* ── App layout ── */
+    .app {
+        flex-direction: column; /* stack dọc thay vì ngang */
+    }
+
+    /* ── Sidebar ẩn hoàn toàn mặc định ── */
+    .sidebar {
+        position: fixed; /* tách khỏi flow */
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 200;
+        transform: translateX(-100%); /* ẩn sang trái */
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 240px !important;
+        min-width: 240px !important;
+        max-width: 240px !important;
+    }
+
+    /* Khi mở sidebar trên mobile */
+    .sidebar.mobile-open {
+        transform: translateX(0); /* hiện ra */
+    }
+
+    /* ── Overlay mờ phía sau sidebar ── */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 199;
+    }
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    /* ── Main chiếm toàn bộ chiều rộng ── */
+    .main {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+        padding: 0 14px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    /* Nút hamburger — chỉ hiện trên mobile */
+    .hamburger-btn {
+        display: flex !important; /* hiện trên mobile */
+    }
+
+    /* ── Content padding nhỏ hơn ── */
+    .content {
+        padding: 14px;
+    }
+
+    /* ── Stat grid 2 cột thay vì 4 ── */
+    .stat-grid,
+    .stat-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+    }
+
+    /* ── Info grid 1 cột ── */
+    .info-grid,
+    .bottom-grid,
+    .form-grid,
+    .modal-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* ── Card grid 1 cột ── */
+    .card-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* ── Table scroll ngang ── */
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    /* ── Form card full width ── */
+    .form-card,
+    .form-wrap,
+    .detail-wrap {
+        max-width: 100% !important;
+        padding: 16px !important;
+    }
+
+    /* ── Modal full width ── */
+    .modal {
+        max-width: calc(100vw - 32px) !important;
+        margin: 0 16px;
+        padding: 20px !important;
+    }
+
+    /* ── Task list filter wrap ── */
+    .filter-bar {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .filter-bar .search-box {
+        width: 100% !important;
+    }
+    .filter-bar .filter-select {
+        width: 100%;
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .toolbar > div {
+        flex-wrap: wrap;
+    }
+    .search-box {
+        width: 100% !important;
+    }
+    .filter-select {
+        flex: 1;
+    }
+
+    /* ── Topbar breadcrumb ẩn ── */
+    .breadcrumb {
+        display: none;
+    }
+
+    /* ── Action bar dạng dọc ── */
+    .action-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+/* ══════════════════════════════════
+   TABLET — 768px → 1024px
+══════════════════════════════════ */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .stat-grid,
+    .stat-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-wrap,
+    .detail-wrap {
+        max-width: 100%;
+    }
+
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ══════════════════════════════════
+   DESKTOP — ẩn hamburger
+══════════════════════════════════ */
+@media (min-width: 769px) {
+    .hamburger-btn {
+        display: none !important;
+    }
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
