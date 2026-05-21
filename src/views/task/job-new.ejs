@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+
+    /* ══════════════════════════════
+       FORM WRAPPER
+    ══════════════════════════════ */
+    .form-wrap {
+      max-width: 672px;      /* tương đương max-w-2xl */
+      margin: 0 auto;        /* tương đương mx-auto */
+    }
+
+    /* ══════════════════════════════
+       FORM CARD
+    ══════════════════════════════ */
+    .form-card {
+      background: #fff;                          /* bg-white */
+      border-radius: 12px;                       /* rounded-xl */
+      border: 1px solid #E5E7EB;                 /* border border-gray-200 */
+      box-shadow: 0 1px 2px rgba(0,0,0,.05);     /* shadow-sm */
+      padding: 32px;                             /* p-8 */
+    }
+
+    /* ══════════════════════════════
+       FORM HEADER
+    ══════════════════════════════ */
+    .form-header {
+      display: flex;                             /* flex */
+      align-items: center;                       /* items-center */
+      gap: 12px;                                 /* gap-3 */
+      margin-bottom: 24px;                       /* mb-6 */
+      padding-bottom: 20px;                      /* pb-5 */
+      border-bottom: 1px solid #F3F4F6;          /* border-b border-gray-100 */
+    }
+    .form-header-icon {
+      width: 36px;                               /* w-9 */
+      height: 36px;                              /* h-9 */
+      border-radius: 8px;                        /* rounded-lg */
+      background: #2563EB;                       /* bg-blue-600 */
+      display: flex;                             /* flex */
+      align-items: center;                       /* items-center */
+      justify-content: center;                   /* justify-center */
+      flex-shrink: 0;
+    }
+    .form-header-icon i {
+      color: #fff;                               /* text-white */
+      font-size: 18px;                           /* text-lg */
+    }
+    .form-header-title {
+      font-size: 18px;                           /* text-lg */
+      font-weight: 700;                          /* font-bold */
+      color: #111827;                            /* text-gray-900 */
+      margin: 0 0 2px;
+    }
+    .form-header-sub {
+      font-size: 14px;                           /* text-sm */
+      color: #6B7280;                            /* text-gray-500 */
+      margin: 0;
+    }
+
+    /* ══════════════════════════════
+       FORM GROUP
+    ══════════════════════════════ */
+    .form-group {
+      margin-bottom: 20px;                       /* mb-5 */
+    }
+    .form-label {
+      display: block;                            /* block */
+      font-size: 12px;                           /* text-xs */
+      font-weight: 600;                          /* font-semibold */
+      color: #4B5563;                            /* text-gray-600 */
+      text-transform: uppercase;                 /* uppercase */
+      letter-spacing: 0.05em;                    /* tracking-wide */
+      margin-bottom: 8px;                        /* mb-2 */
+    }
+    .form-label .required {
+      color: #EF4444;                            /* text-red-500 */
+    }
+
+    /* ══════════════════════════════
+       FORM CONTROLS
+    ══════════════════════════════ */
+    .form-control {
+      width: 100%;                               /* w-full */
+      padding: 10px 16px;                        /* px-4 py-2.5 */
+      border-radius: 8px;                        /* rounded-lg */
+      border: 1px solid #E5E7EB;                 /* border border-gray-200 */
+      font-size: 14px;                           /* text-sm */
+      color: #1F2937;                            /* text-gray-800 */
+      background: #fff;                          /* bg-white */
+      outline: none;                             /* outline-none */
+      transition: border-color .15s,             /* transition */
+                  box-shadow .15s;
+      font-family: inherit;
+      box-sizing: border-box;
+    }
+    .form-control::placeholder {
+      color: #9CA3AF;                            /* placeholder:text-gray-400 */
+    }
+    .form-control:focus {
+      border-color: #3B82F6;                     /* focus:border-blue-500 */
+      box-shadow: 0 0 0 3px rgba(59,130,246,.15);/* focus:ring-2 focus:ring-blue-500 */
+    }
+    textarea.form-control {
+      resize: none;                              /* resize-none */
+      height: auto;
+    }
+
+    /* ══════════════════════════════
+       FORM HINT
+    ══════════════════════════════ */
+    .form-hint {
+      font-size: 12px;                           /* text-xs */
+      color: #9CA3AF;                            /* text-gray-400 */
+      margin-top: 6px;                           /* mt-1.5 */
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ══════════════════════════════
+       FORM ACTIONS
+    ══════════════════════════════ */
+    .form-actions {
+      display: flex;                             /* flex */
+      align-items: center;                       /* items-center */
+      justify-content: flex-end;                 /* justify-end */
+      gap: 12px;                                 /* gap-3 */
+      padding-top: 20px;                         /* pt-5 */
+      border-top: 1px solid #F3F4F6;             /* border-t border-gray-100 */
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;                        /* px-5 py-2.5 */
+      border-radius: 8px;                        /* rounded-lg */
+      font-size: 14px;                           /* text-sm */
+      font-weight: 500;                          /* font-medium */
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      font-family: inherit;
+      transition: all .15s;                      /* transition */
+    }
+    .btn-cancel {
+      color: #4B5563;                            /* text-gray-600 */
+      background: #fff;
+      border: 1px solid #E5E7EB;                 /* border border-gray-200 */
+    }
+    .btn-cancel:hover {
+      background: #F9FAFB;                       /* hover:bg-gray-50 */
+      border-color: #D1D5DB;                     /* hover:border-gray-300 */
+    }
+    .btn-submit {
+      padding: 10px 24px;                        /* px-6 py-2.5 */
+      background: #2563EB;                       /* bg-blue-600 */
+      color: #fff;                               /* text-white */
+      font-weight: 600;                          /* font-semibold */
+    }
+    .btn-submit:hover {
+      background: #1D4ED8;                       /* hover:bg-blue-700 */
+    }
+    .btn-submit:active {
+      transform: scale(0.95);                    /* active:scale-95 */
+    }
+
+    /* ══════════════════════════════
+       HINT BOX
+    ══════════════════════════════ */
+    .hint-box {
+      margin-top: 16px;                          /* mt-4 */
+      padding: 16px;                             /* p-4 */
+      background: #EFF6FF;                       /* bg-blue-50 */
+      border-radius: 8px;                        /* rounded-lg */
+      border: 1px solid #DBEAFE;                 /* border border-blue-100 */
+    }
+    .hint-box-title {
+      font-size: 12px;                           /* text-xs */
+      color: #1D4ED8;                            /* text-blue-700 */
+      font-weight: 600;                          /* font-semibold */
+      margin-bottom: 8px;                        /* mb-2 */
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hint-box ul {
+      list-style: disc;                          /* list-disc */
+      padding-left: 18px;                        /* list-inside */
+      margin: 0;
+    }
+    .hint-box li {
+      font-size: 12px;                           /* text-xs */
+      color: #2563EB;                            /* text-blue-600 */
+      margin-bottom: 4px;                        /* space-y-1 */
+      line-height: 1.5;
+    }
+    .hint-box li:last-child { margin-bottom: 0; }
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <%- include('../partials/sidebar', { page: 'jobs', user: user }) %>
+
+  <div class="main">
+    <div class="topbar" style="justify-content:space-between">
+      <div>
+        <div class="page-title">Thêm công việc mới</div>
+        <div class="breadcrumb">Quản lý / Danh mục công việc / Thêm mới</div>
+      </div>
+      <a href="/api/task/new-job"
+        style="font-size:13px; color:#2563EB; text-decoration:none; display:flex; align-items:center; gap:4px">
+        <i class="ti ti-arrow-left"></i> Quay lại
+      </a>
+    </div>
+
+    <div class="content">
+      <div class="form-wrap">
+        <div class="form-card">
+
+          <!-- Header -->
+          <div class="form-header">
+            <div class="form-header-icon">
+              <i class="ti ti-briefcase"></i>
+            </div>
+            <div>
+              <h2 class="form-header-title">Thêm công việc mới</h2>
+              <p class="form-header-sub">Điền thông tin để tạo danh mục công việc</p>
+            </div>
+          </div>
+
+          <form action="/api/tasks/create-job" method="POST">
+
+            <!-- Danh mục nhóm -->
+            <div class="form-group">
+              <label for="categoryId" class="form-label">
+                Danh mục nhóm <span class="required">*</span>
+              </label>
+              <select id="categoryId" name="categoryId" class="form-control">
+                <option value="">-- Chọn nhóm --</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Tiêu đề -->
+            <div class="form-group">
+              <label for="title" class="form-label">
+                Tiêu đề công việc <span class="required">*</span>
+              </label>
+              <input type="text" id="title" name="title" required
+                class="form-control"
+                placeholder="Ví dụ: Thiết kế giao diện Dashboard...">
+            </div>
+
+            <!-- Mô tả -->
+            <div class="form-group" style="margin-bottom:24px">
+              <label for="description" class="form-label">
+                Mô tả chi tiết <span class="required">*</span>
+              </label>
+              <textarea id="description" name="description" rows="4" required
+                class="form-control"
+                placeholder="Mô tả nội dung, yêu cầu của công việc này..."></textarea>
+              <p class="form-hint">
+                <i class="ti ti-info-circle"></i>
+                Mô tả rõ ràng giúp nhân viên hiểu đúng yêu cầu công việc
+              </p>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-actions">
+              <a href="/api/tasks/new-job" class="btn btn-cancel">
+                <i class="ti ti-x"></i> Hủy bỏ
+              </a>
+              <button type="submit" class="btn btn-submit">
+                <i class="ti ti-plus"></i> Thêm công việc
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Hint box -->
+        <div class="hint-box">
+          <div class="hint-box-title">
+            <i class="ti ti-bulb"></i> Lưu ý khi tạo danh mục công việc:
+          </div>
+          <ul>
+            <li>Tiêu đề phải <strong>duy nhất</strong>, không trùng với công việc đã có</li>
+            <li>Mô tả rõ ràng giúp quản lý giao đúng việc cho nhân viên</li>
+            <li>Chọn đúng nhóm danh mục để dễ tìm kiếm và thống kê</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

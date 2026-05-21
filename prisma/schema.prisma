@@ -1,0 +1,109 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  username     String    @unique @db.VarChar(50)
+  email        String    @unique @db.VarChar(255)
+  password     String    @db.VarChar(255)
+  fullName     String?   @db.VarChar(100)
+  avatarUrl    String?   @db.VarChar(500)
+  role         String    @default("user")
+  isActive     Boolean   @default(true)
+  isVerified   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  // Quan hệ với Employee thông qua id
+  employeeId   Int?      @unique  // unique vì 1 User chỉ gắn 1 Employee
+  employee     Employee? @relation(fields: [employeeId], references: [id])
+
+  @@map("users")
+}
+
+// 1. Bảng Nhân viên
+model Employee {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(100)
+  email     String   @unique
+  role      String   @default("Employee") // Admin, Manager, Employee
+  avatar    String?  // Link ảnh đại diện
+  department String? // Phòng ban
+  
+  departmentId  Int?
+  departmentRel Department? @relation(fields: [departmentId], references: [id])
+
+  user      User?
+
+  // Quan hệ: Một nhân viên có nhiều công việc được giao
+  tasks     Task[]   @relation("AssigneeTasks")
+  
+  // Quan hệ: Một quản lý có nhiều công việc đã giao đi
+  managedTasks Task[] @relation("ManagedTasks")
+
+  @@map("employees")
+}
+
+model Task {
+  id              Int        @id @default(autoincrement())
+  title           String
+  description     String?
+
+  // ← Thêm 2 dòng này
+  categoryId      Int?
+  category        Category?  @relation(fields: [categoryId], references: [id])
+
+  assigneeId      Int
+  assignee        Employee   @relation("AssigneeTasks", fields: [assigneeId], references: [id])
+
+  managerId       Int
+  manager         Employee   @relation("ManagedTasks", fields: [managerId], references: [id])
+
+  assignedDate    DateTime   @default(now())
+  deadline        DateTime
+  completedDate   DateTime?
+  status          String     @default("Pending")
+  progressPercent Int        @default(0)
+  qualityRating   Int?
+
+  @@map("tasks")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique @db.VarChar(100)
+  description String?
+
+  tasks       Task[]
+  jobs        Job[]    
+
+  @@map("categories")
+}
+
+model Job {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
+  description String
+
+  // ← Thêm 2 dòng này
+  categoryId  Int?
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  @@map("jobs")
+}
+
+model Department {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+
+  employees    Employee[] 
+  @@map("departments")
+}

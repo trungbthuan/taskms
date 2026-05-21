@@ -1,0 +1,129 @@
+1. Sơ đồ cấu trúc thư mục
+task-management/
+├── src/
+│   ├── config/             # Cấu hình DB, Biến môi trường (env)
+│   ├── controllers/        # Xử lý logic yêu cầu/phản hồi (Điều hướng)
+│   ├── models/             # Định nghĩa cấu trúc dữ liệu (Schema)
+│   ├── routes/             # Định nghĩa các đường dẫn API
+│   ├── services/           # Xử lý logic nghiệp vụ (Tính toán, nhắc nhở)
+│   ├── middlewares/        # Kiểm tra quyền (Sếp/Nhân viên), Validate dữ liệu
+│   ├── utils/              # Các hàm dùng chung (định dạng ngày tháng, gửi mail)
+│   └── app.js              # File khởi tạo ứng dụng chính
+├── .env                    # Lưu mật khẩu, cổng, chuỗi kết nối DB
+├── .gitignore              # Loại bỏ thư mục node_modules khi lưu trữ
+├── package.json            # Quản lý thư viện
+└── server.js               # File chạy server chính
+
+2. Bước chuẩn bị tiếp theo. Cài đặt thư viện cần thiết
+	npm init -y
+	npm install express dotenv ejs
+	npm install nodemon --save-dev
+cài đặt driver cho PostgreSQL và Sequelize
+	npm install sequelize pg pg-hstore
+
+3. Hướng dẫn Tailwind css
+Bảng tóm tắt Tailwind hay dùng nhất
+Nhóm		Class										Ý nghĩa
+Spacing		p-4, px-4, py-2, m-4, mb-5, mt-2			padding/margin theo 4px
+Sizing		w-full, max-w-2xl, h-9, w-9					chiều rộng/cao
+Typography	text-sm, text-lg, font-bold, uppercase		font size/weight
+Color		text-gray-600, bg-blue-600, border-gray-200	màu chữ/nền/border
+Border		rounded-lg, border, border-gray-200	bo góc, viền
+Flex		flex, items-center, justify-end, gap-3		layout flex
+Focus		focus:ring-2, focus:border-blue-500			style khi focus
+Hover		hover:bg-gray-50, hover:border-gray-300		style khi hover
+Transition	transition, active:scale-95					animation
+
+Tailwind định nghĩa sẵn các mức max-w:
+Class		max-width	Tính ra px
+max-w-xs	20rem		20 × 16 = 320px
+max-w-sm	24rem		24 × 16 = 384px
+max-w-md	28rem		28 × 16 = 448px
+max-w-lg	32rem		32 × 16 = 512px
+max-w-xl	36rem		36 × 16 = 576px
+max-w-2xl	42rem		42 × 16 = 672px
+max-w-3xl	48rem		48 × 16 = 768px
+max-w-4xl	56rem		56 × 16 = 896px
+max-w-5xl	64rem		64 × 16 = 1024px
+max-w-6xl	72rem		72 × 16 = 1152px
+max-w-7xl	80rem		80 × 16 = 1280px
+max-w-full	100%		toàn bộ chiều rộng
+
+Cách chọn max-w phù hợp thực tế
+Form đăng nhập / đăng ký  → max-w-sm  (384px)  — nhỏ gọn
+Form 1 cột đơn giản       → max-w-md  (448px)
+Form 2 cột / chi tiết     → max-w-2xl (672px)  ← bạn đang dùng
+Trang dashboard / table   → max-w-5xl (1024px)
+Full layout               → max-w-7xl (1280px)
+
+Thang rounded Tailwind định nghĩa sẵn
+Class			border-radius	Tính ra px
+rounded-none	0rem			0px
+rounded-sm		0.125rem		0.125 × 16 = 2px
+rounded			0.25rem			0.25 × 16 = 4px
+rounded-md		0.375rem		0.375 × 16 = 6px
+rounded-lg		0.5rem			0.5 × 16 = 8px
+rounded-xl		0.75rem			0.75 × 16 = 12px
+rounded-2xl		1rem			1 × 16 = 16px
+rounded-3xl		1.5rem			1.5 × 16 = 24px
+rounded-full	9999px			hình tròn hoàn toàn
+
+Tailwind dùng thang số từ 50 → 950, số càng lớn màu càng đậm:
+Shade	Ý nghĩa	Dùng cho
+50		Rất rất nhạt		Nền trang, highlight
+100		Rất nhạt			Nền card, hover
+200		Nhạt				Border ← bạn đang dùng
+300		Nhạt vừa			Border hover, placeholder
+400		Trung bình nhạt		Icon, placeholder
+500		Trung bình			Icon chính, text phụ
+600		Trung bình đậm		Text chính, button
+700		Đậm					Button hover
+800		Rất đậm				Heading
+900		Rất rất đậm			Heading chính
+950		Gần đen				Text đậm nhất
+
+Bảng tra cứu w / h phổ biến			
+			
+Class	rem	px	Dùng cho
+w-1		0.25rem	4px	border, divider
+w-2		0.5rem	8px	icon nhỏ
+w-3		0.75rem	12px	icon nhỏ
+w-4		1rem	16px	icon thường
+w-5		1.25rem	20px	icon vừa
+w-6		1.5rem	24px	icon chuẩn
+w-8		2rem	32px	avatar nhỏ
+w-9		2.25rem	36px	icon box ← bạn dùng
+w-10	2.5rem	40px	avatar vừa
+w-12	3rem	48px	avatar lớn
+w-16	4rem	64px	avatar rất lớn
+w-20	5rem	80px	thumbnail
+w-24	6rem	96px	thumbnail lớn
+w-32	8rem	128px	ảnh nhỏ
+w-48	12rem	192px	sidebar thu
+w-64	16rem	256px	sidebar mở
+
+Hệ thống Typography (font-size) 
+Class		font-size	line-height		px		Dùng cho
+text-xs		0.75rem		1rem			12px	badge, label nhỏ
+text-sm		0.875rem	1.25rem			14px	text phụ, input
+text-base	1rem		1.5rem			16px	text mặc định
+text-lg		1.125rem	1.75rem			18px	tiêu đề nhỏ ← bạn dùng
+text-xl		1.25rem		1.75rem			20px	tiêu đề vừa
+text-2xl	1.5rem		2rem			24px	tiêu đề lớn
+text-3xl	1.875rem	2.25rem			30px	heading trang
+text-4xl	2.25rem		2.5rem			36px	hero title
+text-5xl	3rem		1				48px	display lớn
+text-6xl	3.75rem		1				60px	display rất lớn
+
+font-weight đi kèm
+Class			font-weight		Dùng cho
+font-thin			100			rất mỏng
+font-light			300			nhẹ
+font-normal			400			mặc định
+font-medium			500			vừa
+font-semibold		600			khá đậm
+font-bold			700			đậm 		← hay dùng
+font-extrabold		800			rất đậm
+font-black			900			đậm nhất
+
+

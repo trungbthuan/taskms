@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/sidebar.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <style>
+    /* ── Stats Grid ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #64748B;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 32px;
+      font-weight: 600;
+      color: #0F172A;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-sub {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .sub-green  { color: #3B6D11; }
+    .sub-orange { color: #854F0B; }
+    .sub-blue   { color: #1D4ED8; }
+    .sub-red    { color: #A32D2D; }
+
+    /* ── Card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #F1F5F9;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-link {
+      font-size: 12px;
+      color: #2563EB;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-link:hover { text-decoration: underline; }
+
+    /* ── Task rows ── */
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 20px;
+      border-bottom: 1px solid #F8FAFC;
+      transition: background .15s;
+    }
+    .task-row:last-child { border-bottom: none; }
+    .task-row:hover { background: #F8FAFC; }
+
+    .task-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-pending   { background: #94A3B8; }
+    .dot-progress  { background: #2563EB; }
+    .dot-completed { background: #3B6D11; }
+    .dot-stuck     { background: #EF4444; }
+
+    .task-info { flex: 1; min-width: 0; }
+    .task-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #0F172A;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .task-meta { font-size: 11px; color: #94A3B8; margin-top: 2px; }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-pending   { background: #F1F5F9; color: #475569; }
+    .badge-progress  { background: #EFF6FF; color: #1D4ED8; }
+    .badge-completed { background: #EAF3DE; color: #27500A; }
+    .badge-stuck     { background: #FCEBEB; color: #A32D2D; }
+
+    /* Progress bar */
+    .prog-wrap { width: 70px; }
+    .prog-label { font-size: 11px; color: #64748B; text-align: right; margin-bottom: 3px; }
+    .prog-bg { background: #E2E8F0; border-radius: 4px; height: 4px; }
+    .prog-fill { height: 4px; border-radius: 4px; background: #2563EB; }
+
+    /* ── Bottom grid ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* Stat mini row */
+    .mini-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid #F8FAFC;
+    }
+    .mini-row:last-child { border: none; }
+    .mini-label { font-size: 13px; color: #334155; display: flex; align-items: center; gap: 8px; }
+    .mini-val { font-size: 14px; font-weight: 600; color: #0F172A; }
+
+    /* ── Topbar actions ── */
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .topbar-btn {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
+      background: #fff;
+      color: #64748B;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; cursor: pointer;
+      transition: all .15s;
+    }
+    .topbar-btn:hover { border-color: #2563EB; color: #2563EB; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <%- include('./partials/sidebar', { page: 'dashboard', user: user }) %>
+
+  <div class="main">
+    <div class="topbar" style="justify-content:space-between">
+      <div>
+        <div class="page-title"><h1>Dashboard</h1></div>
+        <div class="breadcrumb">Trang chủ / Tổng quan</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" title="Thông báo"><i class="ti ti-bell"></i></button>
+        <button class="topbar-btn" title="Làm mới" onclick="location.reload()"><i class="ti ti-refresh"></i></button>
+        <button class="topbar-btn" title="Tùy chọn"><i class="ti ti-dots"></i></button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── Stat cards ── -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Tổng công việc</div>
+          <div class="stat-value"><%= stats.total %></div>
+          <div class="stat-sub sub-green">
+            <i class="ti ti-trending-up"></i> Cập nhật mới nhất
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Đang xử lý</div>
+          <div class="stat-value"><%= stats.inProgress %></div>
+          <div class="stat-sub sub-orange">
+            <i class="ti ti-clock"></i>
+            <%= stats.nearDeadline %> sắp hết hạn
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-label">Hoàn thành</div>
+          <div class="stat-value"><%= stats.completed %></div>
+          <div class="stat-sub sub-green">
+            <i class="ti ti-circle-check"></i> Tỷ lệ <%= stats.completionRate %>%
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Recent tasks ── -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">
+            <i class="ti ti-history" style="color:#2563EB"></i>
+            Công việc gần đây
+          </span>
+          <a href="/api/tasks" class="card-link">
+            Xem tất cả <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+
+        <% if (recentTasks.length === 0) { %>
+          <div style="text-align:center; padding:32px; color:#94A3B8; font-size:13px">
+            <i class="ti ti-clipboard-off" style="font-size:32px; display:block; margin-bottom:8px"></i>
+            Chưa có công việc nào
+          </div>
+        <% } else { %>
+          <% recentTasks.forEach(task => { %>
+            <div class="task-row">
+              <div class="task-dot
+                <%= task.status === 'Pending'     ? 'dot-pending'   :
+                    task.status === 'In Progress' ? 'dot-progress'  :
+                    task.status === 'Completed'   ? 'dot-completed' : 'dot-stuck' %>">
+              </div>
+
+              <div class="task-info">
+                <div class="task-name"><%= task.title %></div>
+                <div class="task-meta">
+                  <i class="ti ti-user" style="font-size:11px"></i> <%= task.assignee.name %>
+                  &nbsp;·&nbsp;
+                  <i class="ti ti-calendar" style="font-size:11px"></i>
+                  <%= new Date(task.deadline).toLocaleDateString('vi-VN') %>
+                </div>
+              </div>
+
+              <div class="prog-wrap">
+                <div class="prog-label"><%= task.progressPercent %>%</div>
+                <div class="prog-bg">
+                  <div class="prog-fill" style="width: <%= task.progressPercent %>%"></div>
+                </div>
+              </div>
+
+              <%
+                const badgeClass =
+                  task.status === 'Pending'     ? 'badge-pending'   :
+                  task.status === 'In Progress' ? 'badge-progress'  :
+                  task.status === 'Completed'   ? 'badge-completed' : 'badge-stuck';
+                const badgeLabel =
+                  task.status === 'Pending'     ? 'Chờ thực hiện'   :
+                  task.status === 'In Progress' ? 'Đang làm'        :
+                  task.status === 'Completed'   ? 'Xong'            : 'Vướng mắc';
+              %>
+              <span class="badge <%= badgeClass %>"><%= badgeLabel %></span>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- ── Bottom grid ── -->
+      <div class="bottom-grid">
+
+        <!-- Tổng hợp trạng thái -->
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head">
+            <span class="card-title">
+              <i class="ti ti-chart-pie" style="color:#2563EB"></i>
+              Tổng hợp trạng thái
+            </span>
+          </div>
+          <div class="mini-row">
+            <span class="mini-label">
+              <span style="width:8px;height:8px;border-radius:50%;background:#94A3B8;display:inline-block"></span>
+              Chờ thực hiện
+            </span>
+            <span class="mini-val"><%= stats.total - stats.inProgress - stats.completed - stats.stuck %></span>
+          </div>
+          <div class="mini-row">
+            <span class="mini-label">
+              <span style="width:8px;height:8px;border-radius:50%;background:#2563EB;display:inline-block"></span>
+              Đang thực hiện
+            </span>
+            <span class="mini-val sub-blue"><%= stats.inProgress %></span>
+          </div>
+          <div class="mini-row">
+            <span class="mini-label">
+              <span style="width:8px;height:8px;border-radius:50%;background:#3B6D11;display:inline-block"></span>
+              Hoàn thành
+            </span>
+            <span class="mini-val sub-green"><%= stats.completed %></span>
+          </div>
+          <div class="mini-row">
+            <span class="mini-label">
+              <span style="width:8px;height:8px;border-radius:50%;background:#EF4444;display:inline-block"></span>
+              Vướng mắc
+            </span>
+            <span class="mini-val sub-red"><%= stats.stuck %></span>
+          </div>
+        </div>
+
+        <!-- Công việc sắp hết hạn -->
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head">
+            <span class="card-title">
+              <i class="ti ti-alarm" style="color:#EF4444"></i>
+              Sắp hết hạn
+            </span>
+            <a href="/api/tasks" class="card-link">Xem thêm</a>
+          </div>
+          <% const overdueTasks = recentTasks.filter(t =>
+              t.status !== 'Completed' &&
+              new Date(t.deadline) <= new Date(Date.now() + 3*24*60*60*1000)
+            );
+          %>
+          <% if (overdueTasks.length === 0) { %>
+            <div style="text-align:center; padding:24px; color:#94A3B8; font-size:13px">
+              <i class="ti ti-circle-check" style="font-size:28px; display:block; margin-bottom:6px; color:#3B6D11"></i>
+              Không có việc nào sắp hết hạn
+            </div>
+          <% } else { %>
+            <% overdueTasks.forEach(task => { %>
+              <div class="mini-row">
+                <span class="mini-label" style="flex:1; min-width:0">
+                  <i class="ti ti-point-filled" style="color:#EF4444; font-size:16px"></i>
+                  <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <%= task.title %>
+                  </span>
+                </span>
+                <span style="font-size:11px; color:#EF4444; margin-left:8px; white-space:nowrap">
+                  <%= new Date(task.deadline).toLocaleDateString('vi-VN') %>
+                </span>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

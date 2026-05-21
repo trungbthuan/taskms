@@ -1,0 +1,112 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+<aside class="sidebar open" id="sb">
+    <div class="sb-header">
+        <button class="sb-toggle" onclick="toggleSB()">
+            <i class="ti ti-layout-sidebar" style="font-size: 18px"></i>
+        </button>
+        <span class="sb-logo">TaskFlow</span>
+    </div>
+
+    <nav class="sb-nav">
+        <div class="nav-section">TỔNG QUAN</div>
+        <a href="/api/tasks/dashboard" class="nav-item <%= page === 'dashboard' ? 'active' : '' %>">
+            <span class="nav-icon"><i class="ti ti-layout-dashboard"></i></span>
+            <span class="nav-label">Dashboard</span>
+        </a>
+
+        <div class="divider"></div>
+        <div class="nav-section">QUẢN LÝ</div>
+
+        <button class="nav-item" onclick="toggleSub('category-sub', 'category-chev')">
+            <span class="nav-icon"><i class="ti ti-checklist"></i></span>
+            <span class="nav-label">Tạo danh mục</span>
+            <span class="nav-badge">3</span>
+            <i class="ti ti-chevron-down chevron" id="category-chev"></i>
+        </button>
+        <div class="submenu <%= page === 'categories' ? 'show' : '' %>" id="category-sub">
+            <a href="#" class="sub-item">Danh mục nhân viên</a>
+            <a href="/api/tasks/new-job" class="sub-item <%= page === 'jobs' ? 'active' : '' %>">Danh mục công việc</a>
+            <a href="#" class="sub-item">Danh mục tào lao</a>
+        </div>
+
+        <button class="nav-item" onclick="toggleSub('task-sub', 'task-chev')">
+            <span class="nav-icon"><i class="ti ti-checklist"></i></span>
+            <span class="nav-label">Công việc</span>
+            <span class="nav-badge">5</span>
+            <i class="ti ti-chevron-down chevron" id="task-chev"></i>
+        </button>
+        <div class="submenu <%= page === 'tasks' ? 'show' : '' %>" id="task-sub">
+            <a href="/api/tasks/new" class="sub-item">Giao việc mới</a>
+            <a href="/api/tasks/list" class="sub-item <%= page === 'tasks' ? 'active' : '' %>">Danh sách công việc</a>
+            <a href="/api/tasks/id:progress" class="sub-item" style="pointer-events: none">Cập nhật tiến độ</a>
+            <a href="/api/tasks?status=stuck" class="sub-item">Việc vướng mắc</a>
+            <a href="/api/tasks/review" class="sub-item">Đánh giá & nghiệm thu</a>
+        </div>
+
+        <button class="nav-item" onclick="toggleSub('team-sub', 'team-chev')">
+            <span class="nav-icon"><i class="ti ti-users"></i></span>
+            <span class="nav-label">Nhân sự</span>
+            <i class="ti ti-chevron-down chevron" id="team-chev"></i>
+        </button>
+        <div class="submenu" id="team-sub">
+            <a href="/api/employees/list" class="sub-item <%= page === 'employees' ? 'active' : '' %>"> Danh sách nhân viên </a>
+            <a href="/api/employees/assign" class="sub-item">Thêm nhân viên mới</a>
+        </div>
+
+        <div class="divider"></div>
+        <div class="nav-section">BÁO CÁO</div>
+
+        <a href="/api/auth/test" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
+            <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
+            <span class="nav-label">Test</span>
+        </a>
+        <a href="/stats" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
+            <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
+            <span class="nav-label">Thống kê</span>
+        </a>
+        <a href="/reports" class="nav-item">
+            <span class="nav-icon"><i class="ti ti-file-analytics"></i></span>
+            <span class="nav-label">Báo cáo</span>
+        </a>
+
+        <div class="divider"></div>
+        <a href="/settings" class="nav-item">
+            <span class="nav-icon"><i class="ti ti-settings"></i></span>
+            <span class="nav-label">Cài đặt</span>
+        </a>
+    </nav>
+
+    <div class="sb-footer">
+        <div class="user-row">
+            <div class="avatar"><%= user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U' %></div>
+            <div class="user-info">
+                <div class="user-name"><%= user.fullName || user.username %></div>
+                <div class="user-role"><%= user.role %></div>
+            </div>
+            <a href="/api/auth/logout" class="logout-btn" title="Đăng xuất">
+                <i class="ti ti-logout"></i>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<script>
+    function toggleSB() {
+        const sb = document.getElementById("sb");
+        sb.classList.toggle("open");
+        if (!sb.classList.contains("open")) {
+            document.querySelectorAll(".submenu").forEach((m) => m.classList.remove("show"));
+            document.querySelectorAll(".chevron").forEach((c) => c.classList.remove("rotated"));
+        }
+    }
+    function toggleSub(menuId, chevId) {
+        const sb = document.getElementById("sb");
+        if (!sb.classList.contains("open")) {
+            sb.classList.add("open");
+            return;
+        }
+        document.getElementById(menuId).classList.toggle("show");
+        document.getElementById(chevId).classList.toggle("rotated");
+    }
+</script>

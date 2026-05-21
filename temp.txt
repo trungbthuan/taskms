@@ -1,0 +1,8 @@
+Bước tiếp theo bạn muốn học gì?
+
+🔐 Phân quyền RBAC — Manager thấy khác Employee
+👥 Quản lý nhân viên — CRUD bảng Employee
+📊 Thống kê nâng cao — biểu đồ theo tháng/phòng ban
+🔔 Thông báo — deadline sắp đến
+📱 Responsive — tối ưu giao diện mobile
+🚀 Deploy — đưa project lên server thật

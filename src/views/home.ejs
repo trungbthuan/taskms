@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title><%= title %></title>
+      <link rel="stylesheet" href="/css/sidebar.css">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+      <%- include('./partials/head') %>
+    </head>
+    <body>
+      <div class="app">
+        <%- include('./partials/sidebar', { page: 'dashboard', user: user }) %>
+        <div class="content">
+            <div class="m-auto text-center">
+                <h1 class="text-4xl font-bold mb-4">Trang tạm thời</h1>
+                <p style="color: blue; font-size: 2.125rem;">Đây là trang tạm thời để kiểm tra giao diện sidebar.</p>
+                <h1 class="text-4xl font-bold mb-4">Xin chào, <%= user.fullName || user.username %>!</h1>
+            </div>
+        </div>
+      </div>
+    </body>
+</html>

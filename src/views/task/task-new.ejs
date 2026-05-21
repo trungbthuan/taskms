@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <%- include('../partials/head') %>
+</head>
+<body>
+
+<div class="app">
+  <%- include('../partials/sidebar', { page: 'tasks-new', user: user }) %>
+
+  <div class="main">
+    <div class="content">
+      <div style="max-width:680px; margin:0 auto;">
+        <div style="background:#fff; padding:2rem; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,.06)">
+
+          <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            <i class="fas fa-plus-circle text-blue-600"></i> Tạo Công Việc Mới
+          </h2>
+          <form action="/api/tasks/assign" method="POST" class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Người tạo</label>
+              <input class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" value=" <%= user.employee.name + ' - ' + user.employee.department || 'Không xác định' %>" readonly>
+              <input name="managerId" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm" value=" <%= user.employee.id %>" hidden>
+            </div>
+
+            <!-- Danh mục -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Danh mục công việc</label>
+              <select name="categoryId" id="categorySelect" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                <option value="">-- Chọn danh mục --</option>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat.id %>"><%= cat.name %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Tiêu đề công việc — lọc theo danh mục -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tiêu đề công việc</label>
+              <select name="title" id="title" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                <option value="">-- Chọn công việc --</option>
+                <% jobs.forEach(job => { %>
+                  <option value="<%= job.title %>"
+                          data-category="<%= job.categoryId %>"
+                          data-description="<%= job.description %>">
+                    <%= job.title %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <!-- Nhân viên & Deadline -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nhân viên thực hiện</label>
+                <select name="assigneeId" required
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                  <option value="">-- Chọn nhân viên --</option>
+                  <% employees.forEach(emp => { %>
+                    <option value="<%= emp.id %>"><%= emp.name %> — <%= emp.department %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Hạn chót (Deadline)</label>
+                <input type="date" name="deadline" required id="deadline"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm"/>
+              </div>
+            </div>
+
+            <!-- Độ ưu tiên -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Độ ưu tiên</label>
+              <div class="flex gap-4">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="priority" value="low" class="accent-green-500">
+                  <span class="text-sm text-green-600 font-medium">Thấp</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="priority" value="medium" checked class="accent-yellow-500">
+                  <span class="text-sm text-yellow-600 font-medium">Trung bình</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="priority" value="high" class="accent-red-500">
+                  <span class="text-sm text-red-600 font-medium">Cao</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Mô tả -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mô tả chi tiết</label>
+              <textarea name="description" id="description" rows="4"
+                class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm resize-none"
+                placeholder="Nội dung công việc cần thực hiện..."></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex justify-end gap-3 pt-2">
+              <a href="/dashboard"
+                class="px-5 py-2.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-all">Hủy bỏ</a>
+              <button type="submit"
+                class="px-6 py-2.5 text-sm bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                <i class="fas fa-paper-plane mr-1"></i> Giao việc ngay
+              </button>
+            </div>
+
+          </form>
+    </div>
+  </div>
+  <script>
+    const jobSelect = document.getElementById("title");
+    const deadlineInput = document.getElementById('deadline');
+    const descriptionSelect = document.getElementById("description");
+
+    // Khi chọn danh mục → lọc công việc tương ứng
+    document.getElementById('categorySelect').addEventListener('change', function() {
+        const selectedCategoryId = this.value;
+        const jobOptions = document.querySelectorAll('#title option[data-category]');
+
+        jobOptions.forEach(option => {
+            if (!selectedCategoryId || option.dataset.category === selectedCategoryId) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+        // Reset job select
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+    });
+
+    // Khi người dùng chọn một công việc, tự động điền mô tả tương ứng
+    jobSelect.addEventListener("change", (event) => {
+      const selectedOption = event.target.options[event.target.selectedIndex];
+      descriptionSelect.value = selectedOption.dataset.description || '';
+    });
+
+    // Đặt giá trị mặc định cho deadline là ngày hiện tại
+    const now = new Date();
+    // Bù timezone về giờ địa phương
+    const offset = now.getTimezoneOffset() * 60000;
+    const localTime = new Date(now - offset);
+    const formatted = localTime.toISOString().slice(0, 10); // "2025-06-10T14:30"
+
+    console.log('Giờ hiện tại:', formatted); // ← kiểm tra trong DevTools (F12)
+
+    deadlineInput.min   = formatted;
+    deadlineInput.value = formatted;
+
+  </script>
+
+</body>
+</html>

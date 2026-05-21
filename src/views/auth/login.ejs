@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập — TaskFlow</title>
+  <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="form-card">
+
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">TaskFlow</div>
+          <div class="brand-sub">Enterprise Suite</div>
+        </div>
+      </div>
+
+      <h2>ĐĂNG NHẬP</h2>
+      <p class="subtitle">Đăng nhập để tiếp tục vào hệ thống</p>
+
+      <% if (locals.error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form action="/api/auth/login" method="POST">
+        <div class="field">
+          <label for="username">Tài khoản </label>
+          <input type="text" id="username" name="username"
+            placeholder="Tên tài khoản" required>
+            <!-- value="<%= locals.email || '' %>"> -->
+        </div>
+
+        <div class="field">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" name="password"
+            placeholder="••••••••" required>
+        </div>
+
+        <div class="forgot">
+          <a href="/auth/forgot-password">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="btn-primary">Đăng nhập</button>
+      </form>
+
+      <div class="link-row">
+        Chưa có tài khoản? <a href="/api/auth/register">Đăng ký ngay</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    /* ── Layout ── */
+    .page-wrap { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Stats ── */
+    .stat-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    .stat-card {
+      background: #fff; border: 1px solid #E2E8F0;
+      border-radius: 10px; padding: 16px 20px;
+    }
+    .stat-label { font-size: 12px; color: #64748B; margin-bottom: 6px; }
+    .stat-val   { font-size: 26px; font-weight: 700; color: #0F172A; }
+    .stat-sub   { font-size: 11px; margin-top: 3px; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      border: 1px solid #E2E8F0; border-radius: 8px;
+      padding: 0 12px; height: 36px; width: 260px; background: #fff;
+    }
+    .search-box input {
+      border: none; outline: none; font-size: 13px;
+      color: #334155; width: 100%; background: transparent;
+    }
+    .search-box i { color: #94A3B8; font-size: 16px; }
+    .filter-select {
+      height: 36px; padding: 0 10px; border: 1px solid #E2E8F0;
+      border-radius: 8px; font-size: 13px; color: #334155;
+      background: #fff; outline: none; cursor: pointer;
+    }
+    .btn-add {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; background: #2563EB; color: #fff;
+      border: none; border-radius: 8px; font-size: 13px;
+      font-weight: 500; cursor: pointer; text-decoration: none;
+    }
+    .btn-add:hover { background: #1D4ED8; }
+
+    /* ── Card Grid ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+    .emp-card {
+      background: #fff; border: 1px solid #E2E8F0;
+      border-radius: 12px; padding: 20px;
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; transition: box-shadow .15s;
+      position: relative;
+    }
+    .emp-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .emp-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: #2563EB; display: flex; align-items: center;
+      justify-content: center; font-size: 22px; font-weight: 700;
+      color: #fff; margin-bottom: 12px; flex-shrink: 0;
+    }
+    .emp-name  { font-size: 14px; font-weight: 600; color: #0F172A; margin-bottom: 3px; }
+    .emp-email { font-size: 11px; color: #94A3B8; margin-bottom: 8px; word-break: break-all; }
+    .emp-dept  { font-size: 11px; color: #64748B; margin-bottom: 10px; }
+    .role-badge {
+      font-size: 10px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px; margin-bottom: 12px;
+    }
+    .role-admin    { background: #FEF3C7; color: #92400E; }
+    .role-manager  { background: #EDE9FE; color: #5B21B6; }
+    .role-employee { background: #EFF6FF; color: #1D4ED8; }
+    .emp-stats {
+      display: flex; gap: 12px; width: 100%;
+      border-top: 1px solid #F1F5F9; padding-top: 12px; margin-top: 4px;
+    }
+    .emp-stat { flex: 1; text-align: center; }
+    .emp-stat-val { font-size: 16px; font-weight: 700; color: #0F172A; }
+    .emp-stat-label { font-size: 10px; color: #94A3B8; }
+    .card-actions {
+      position: absolute; top: 12px; right: 12px;
+      display: flex; gap: 4px; opacity: 0; transition: opacity .15s;
+    }
+    .emp-card:hover .card-actions { opacity: 1; }
+    .btn-icon {
+      width: 26px; height: 26px; border-radius: 6px;
+      border: 1px solid #E2E8F0; background: #fff;
+      color: #64748B; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 13px; text-decoration: none; transition: all .15s;
+    }
+    .btn-icon:hover { border-color: #2563EB; color: #2563EB; background: #EFF6FF; }
+    .btn-icon.danger:hover { border-color: #EF4444; color: #EF4444; background: #FCEBEB; }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: #fff; border: 1px solid #E2E8F0;
+      border-radius: 10px; overflow: hidden;
+    }
+    .table-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; border-bottom: 1px solid #F1F5F9;
+    }
+    .table-title { font-size: 14px; font-weight: 600; color: #0F172A; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 10px 16px; text-align: left; font-size: 11px;
+      font-weight: 600; color: #64748B; text-transform: uppercase;
+      letter-spacing: .05em; background: #F8FAFC;
+      border-bottom: 1px solid #E2E8F0; white-space: nowrap;
+    }
+    tbody tr { transition: background .15s; }
+    tbody tr:hover { background: #F8FAFC; }
+    tbody td {
+      padding: 12px 16px; font-size: 13px; color: #334155;
+      border-bottom: 1px solid #F1F5F9; vertical-align: middle;
+    }
+    tbody tr:last-child td { border: none; }
+    .td-name { display: flex; align-items: center; gap: 10px; }
+    .avatar-sm {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      background: #2563EB; flex-shrink: 0;
+    }
+    .action-btns { display: flex; gap: 6px; }
+
+    /* ── View toggle ── */
+    .view-toggle { display: flex; gap: 4px; }
+    .toggle-btn {
+      width: 32px; height: 32px; border-radius: 6px;
+      border: 1px solid #E2E8F0; background: #fff;
+      color: #94A3B8; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; font-size: 15px;
+    }
+    .toggle-btn.active { background: #2563EB; color: #fff; border-color: #2563EB; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.4);
+      display: none; align-items: center; justify-content: center; z-index: 999;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; border-radius: 14px; padding: 28px;
+      width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    }
+    .modal-title {
+      font-size: 16px; font-weight: 700; color: #0F172A;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .modal-group { margin-bottom: 14px; }
+    .modal-group.full { grid-column: 1/-1; }
+    .modal-label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: #64748B; text-transform: uppercase;
+      letter-spacing: .05em; margin-bottom: 5px;
+    }
+    .modal-control {
+      width: 100%; height: 38px; padding: 0 12px;
+      border: 1px solid #E2E8F0; border-radius: 8px;
+      font-size: 13px; color: #0F172A; background: #fff;
+      outline: none; font-family: inherit; box-sizing: border-box;
+    }
+    .modal-control:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-modal-cancel {
+      padding: 9px 18px; border-radius: 8px; font-size: 13px;
+      font-weight: 500; cursor: pointer; border: 1px solid #E2E8F0;
+      background: #fff; color: #374151; font-family: inherit;
+    }
+    .btn-modal-cancel:hover { background: #F8FAFC; }
+    .btn-modal-submit {
+      padding: 9px 20px; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer; border: none;
+      background: #2563EB; color: #fff; font-family: inherit;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-modal-submit:hover { background: #1D4ED8; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <%- include('../partials/sidebar', { page: 'employees', user: user }) %>
+
+  <div class="main">
+    <div class="topbar" style="justify-content:space-between">
+      <div>
+        <div class="page-title">Quản lý nhân sự</div>
+        <div class="breadcrumb">Nhân sự / Danh sách</div>
+      </div>
+      <button class="btn-add" onclick="openModal()">
+        <i class="ti ti-user-plus"></i> Thêm nhân viên
+      </button>
+    </div>
+
+    <div class="content">
+      <div class="page-wrap">
+
+        <!-- Stats -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-label">Tổng nhân viên</div>
+            <div class="stat-val"><%= employees.length %></div>
+            <div class="stat-sub" style="color:#3B6D11">Đang hoạt động</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Quản lý</div>
+            <div class="stat-val"><%= employees.filter(e => e.role === 'Manager').length %></div>
+            <div class="stat-sub" style="color:#5B21B6">Manager</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Nhân viên</div>
+            <div class="stat-val"><%= employees.filter(e => e.role === 'Employee').length %></div>
+            <div class="stat-sub" style="color:#1D4ED8">Employee</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Phòng ban</div>
+            <div class="stat-val"><%= departments.length %></div>
+            <div class="stat-sub" style="color:#64748B">Departments</div>
+          </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <div style="display:flex; gap:10px; flex-wrap:wrap">
+            <div class="search-box">
+              <i class="ti ti-search"></i>
+              <input type="text" id="searchInput" placeholder="Tìm tên, email...">
+            </div>
+            <select class="filter-select" id="filterRole">
+              <option value="">Tất cả vai trò</option>
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Employee">Employee</option>
+            </select>
+            <select class="filter-select" id="filterDept">
+              <option value="">Tất cả phòng ban</option>
+              <% departments.forEach(d => { %>
+                <option value="<%= d.name %>"><%= d.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="view-toggle">
+            <button class="toggle-btn active" id="btnCard" onclick="switchView('card')" title="Dạng thẻ">
+              <i class="ti ti-layout-grid"></i>
+            </button>
+            <button class="toggle-btn" id="btnTable" onclick="switchView('table')" title="Dạng bảng">
+              <i class="ti ti-table"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Card View -->
+        <div class="card-grid" id="cardView">
+          <% employees.forEach(emp => { %>
+            <%
+              const colors = ['#2563EB','#7C3AED','#0891B2','#16A34A','#EA580C','#DB2777'];
+              const color  = colors[emp.id % colors.length];
+              const roleClass =
+                emp.role === 'Admin'    ? 'role-admin'    :
+                emp.role === 'Manager'  ? 'role-manager'  : 'role-employee';
+            %>
+            <div class="emp-card"
+              data-name="<%= emp.name.toLowerCase() %>"
+              data-email="<%= emp.email.toLowerCase() %>"
+              data-role="<%= emp.role %>"
+              data-dept="<%= emp.departmentRel ? emp.departmentRel.name : '' %>">
+
+              <div class="card-actions">
+                <a href="/api/employees/<%= emp.id %>/edit" class="btn-icon" title="Sửa">
+                  <i class="ti ti-edit"></i>
+                </a>
+                <button class="btn-icon danger" title="Xóa" onclick="deleteEmp(<%= emp.id %>, '<%= emp.name %>')">
+                  <i class="ti ti-trash"></i>
+                </button>
+              </div>
+
+              <div class="emp-avatar" style="background:<%= color %>">
+                <%= emp.name.charAt(0).toUpperCase() %>
+              </div>
+              <div class="emp-name"><%= emp.name %></div>
+              <div class="emp-email"><%= emp.email %></div>
+              <div class="emp-dept">
+                <i class="ti ti-building" style="font-size:11px"></i>
+                <%= emp.departmentRel ? emp.departmentRel.name : (emp.department || 'Chưa phân phòng') %>
+              </div>
+              <span class="role-badge <%= roleClass %>"><%= emp.role %></span>
+              <div class="emp-stats">
+                <div class="emp-stat">
+                  <div class="emp-stat-val"><%= emp.tasks.length %></div>
+                  <div class="emp-stat-label">Được giao</div>
+                </div>
+                <div class="emp-stat">
+                  <div class="emp-stat-val"><%= emp.managedTasks.length %></div>
+                  <div class="emp-stat-label">Quản lý</div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <!-- Table View -->
+        <div class="table-wrap" id="tableView" style="display:none">
+          <div class="table-head">
+            <span class="table-title">
+              <i class="ti ti-users" style="color:#2563EB; margin-right:6px"></i>
+              Danh sách nhân viên
+              <span style="font-size:12px; color:#64748B; font-weight:400; margin-left:6px">
+                (<%= employees.length %> người)
+              </span>
+            </span>
+          </div>
+          <div style="overflow-x:auto">
+            <table id="empTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Nhân viên</th>
+                  <th>Email</th>
+                  <th>Vai trò</th>
+                  <th>Phòng ban</th>
+                  <th>Được giao</th>
+                  <th>Quản lý</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="empBody">
+                <% employees.forEach((emp, index) => { %>
+                  <%
+                    const colors = ['#2563EB','#7C3AED','#0891B2','#16A34A','#EA580C','#DB2777'];
+                    const color  = colors[emp.id % colors.length];
+                    const roleClass =
+                      emp.role === 'Admin'   ? 'role-admin'   :
+                      emp.role === 'Manager' ? 'role-manager' : 'role-employee';
+                  %>
+                  <tr data-name="<%= emp.name.toLowerCase() %>"
+                      data-email="<%= emp.email.toLowerCase() %>"
+                      data-role="<%= emp.role %>"
+                      data-dept="<%= emp.departmentRel ? emp.departmentRel.name : '' %>">
+                    <td style="color:#94A3B8; font-size:12px"><%= index + 1 %></td>
+                    <td>
+                      <div class="td-name">
+                        <div class="avatar-sm" style="background:<%= color %>">
+                          <%= emp.name.charAt(0).toUpperCase() %>
+                        </div>
+                        <span style="font-weight:500; color:#0F172A"><%= emp.name %></span>
+                      </div>
+                    </td>
+                    <td style="color:#64748B"><%= emp.email %></td>
+                    <td><span class="role-badge <%= roleClass %>"><%= emp.role %></span></td>
+                    <td><%= emp.departmentRel ? emp.departmentRel.name : (emp.department || '—') %></td>
+                    <td style="text-align:center; font-weight:600"><%= emp.tasks.length %></td>
+                    <td style="text-align:center; font-weight:600"><%= emp.managedTasks.length %></td>
+                    <td>
+                      <div class="action-btns">
+                        <a href="/api/employees/<%= emp.id %>/edit" class="btn-icon" title="Sửa">
+                          <i class="ti ti-edit"></i>
+                        </a>
+                        <button class="btn-icon danger" title="Xóa"
+                          onclick="deleteEmp(<%= emp.id %>, '<%= emp.name %>')">
+                          <i class="ti ti-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Thêm nhân viên -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <i class="ti ti-user-plus" style="color:#2563EB"></i>
+      Thêm nhân viên mới
+    </div>
+    <form action="/api/employees/create" method="POST">
+      <div class="modal-grid">
+
+        <div class="modal-group full">
+          <label class="modal-label">Họ và tên <span style="color:#EF4444">*</span></label>
+          <input type="text" name="name" required class="modal-control" placeholder="Nguyễn Văn A">
+        </div>
+
+        <div class="modal-group full">
+          <label class="modal-label">Email <span style="color:#EF4444">*</span></label>
+          <input type="email" name="email" required class="modal-control" placeholder="a@company.vn">
+        </div>
+
+        <div class="modal-group">
+          <label class="modal-label">Vai trò</label>
+          <select name="role" class="modal-control">
+            <option value="Employee">Employee</option>
+            <option value="Manager">Manager</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+
+        <div class="modal-group">
+          <label class="modal-label">Phòng ban</label>
+          <select name="departmentId" class="modal-control">
+            <option value="">-- Chọn phòng ban --</option>
+            <% departments.forEach(d => { %>
+              <option value="<%= d.id %>"><%= d.name %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="modal-group full">
+          <label class="modal-label">Link ảnh đại diện</label>
+          <input type="text" name="avatar" class="modal-control"
+            placeholder="https://...">
+        </div>
+
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-cancel" onclick="closeModal()">
+          Hủy
+        </button>
+        <button type="submit" class="btn-modal-submit">
+          <i class="ti ti-plus"></i> Thêm nhân viên
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// ── View toggle ──────────────────────────────
+function switchView(view) {
+    const cardView  = document.getElementById('cardView');
+    const tableView = document.getElementById('tableView');
+    const btnCard   = document.getElementById('btnCard');
+    const btnTable  = document.getElementById('btnTable');
+
+    if (view === 'card') {
+        cardView.style.display  = 'grid';
+        tableView.style.display = 'none';
+        btnCard.classList.add('active');
+        btnTable.classList.remove('active');
+    } else {
+        cardView.style.display  = 'none';
+        tableView.style.display = 'block';
+        btnCard.classList.remove('active');
+        btnTable.classList.add('active');
+    }
+}
+
+// ── Search & Filter ──────────────────────────
+function applyFilter() {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const role    = document.getElementById('filterRole').value;
+    const dept    = document.getElementById('filterDept').value;
+
+    // Filter cards
+    document.querySelectorAll('.emp-card').forEach(card => {
+        const match =
+            (card.dataset.name.includes(keyword) || card.dataset.email.includes(keyword)) &&
+            (!role || card.dataset.role === role) &&
+            (!dept || card.dataset.dept === dept);
+        card.style.display = match ? '' : 'none';
+    });
+
+    // Filter table rows
+    document.querySelectorAll('#empBody tr').forEach(row => {
+        const match =
+            (row.dataset.name.includes(keyword) || row.dataset.email.includes(keyword)) &&
+            (!role || row.dataset.role === role) &&
+            (!dept || row.dataset.dept === dept);
+        row.style.display = match ? '' : 'none';
+    });
+}
+
+document.getElementById('searchInput').addEventListener('input', applyFilter);
+document.getElementById('filterRole').addEventListener('change', applyFilter);
+document.getElementById('filterDept').addEventListener('change', applyFilter);
+
+// ── Modal ────────────────────────────────────
+function openModal()  { document.getElementById('modalOverlay').classList.add('show'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+});
+
+// ── Delete ───────────────────────────────────
+async function deleteEmp(id, name) {
+    if (!confirm(`Bạn có chắc muốn xóa nhân viên "${name}"?`)) return;
+    try {
+        const res = await fetch(`/api/employees/${id}`, { method: 'DELETE' });
+        if (res.ok) location.reload();
+        else {
+            const data = await res.json();
+            alert('Xóa thất bại: ' + data.message);
+        }
+    } catch (e) {
+        alert('Lỗi kết nối server!');
+    }
+}
+</script>
+</body>
+</html>

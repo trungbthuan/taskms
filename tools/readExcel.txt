@@ -1,0 +1,7 @@
+Các bước thực hiện
+Bước 1: Khởi tạo dự án và cài đặt thư viện
+# Khởi tạo dự án Node.js (nếu chưa có)
+npm init -y
+
+# Cài đặt thư viện exceljs
+npm install exceljs

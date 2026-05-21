@@ -1,0 +1,98 @@
+<!-- Dùng Tailwind CSS để layout nhanh và đẹp -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+<!-- Cấu trúc Sidebar Hiện Đại -->
+<div class="flex h-screen bg-gray-100 overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-slate-900 text-gray-300 transition-all duration-300 ease-in-out flex flex-col shadow-xl w-20">
+        <!-- Logo / Toggle Button -->
+        <div class="h-20 flex items-center px-6 bg-slate-950">
+            <button onclick="toggleSidebar()" class="text-blue-400 hover:text-white focus:outline-none">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            <span class="sidebar-text ml-4 font-bold text-xl text-white overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300">TaskFlow</span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 mt-4 space-y-2 px-3 overflow-y-auto">
+            <!-- Dashboard -->
+            <a href="/dashboard" class="flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-blue-400 transition-colors group">
+                <div class="min-w-[40px]"><i class="fas fa-th-large text-xl"></i></div>
+                <span class="sidebar-text opacity-0 overflow-hidden whitespace-nowrap transition-all duration-300">Dashboard</span>
+            </a>
+
+            <!-- Menu Quản lý Công việc (Có menu con) -->
+            <div>
+                <button onclick="toggleSubmenu('task-menu')" class="w-full flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-blue-400 transition-colors group">
+                    <div class="min-w-[40px]"><i class="fas fa-tasks text-xl"></i></div>
+                    <span class="sidebar-text flex-1 text-left opacity-0 overflow-hidden whitespace-nowrap transition-all duration-300">Công việc</span>
+                    <i id="task-arrow" class="fas fa-chevron-down text-xs sidebar-text opacity-0"></i>
+                </button>
+                <div id="task-menu" class="hidden pl-12 mt-2 space-y-1 bg-slate-800/50 rounded-lg">
+                    <a href="/api/tasks/new" class="block p-2 text-sm hover:text-blue-400"><i class="fas fa-tasks text-xl"></i> Giao việc mới</a>
+                    <a href="/tasks" class="block p-2 text-sm hover:text-blue-400"> Danh sách công việc</a>
+                    <a href="/tasks?status=stuck" class="block p-2 text-sm hover:text-red-400"> Việc vướng mắc</a>
+                    <a href="/tasks?status=stuck" class="block p-2 text-sm hover:text-red-400"> Cập nhật tiến độ</a>
+                    <a href="/tasks?status=stuck" class="block p-2 text-sm hover:text-red-400"> Đánh giá & Nghiệm thu</a>
+                </div>
+            </div>
+
+            <!-- Báo cáo Thống kê -->
+            <a href="/stats" class="flex items-center p-3 rounded-lg hover:bg-slate-800 hover:text-blue-400 transition-colors group">
+                <div class="min-w-[40px]"><i class="fas fa-chart-pie text-xl"></i></div>
+                <span class="sidebar-text opacity-0 overflow-hidden whitespace-nowrap transition-all duration-300">Thống kê</span>
+            </a>
+        </nav>
+
+        <!-- Profile / Logout -->
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center">
+                <img src="https://ui-avatars.com/api/?name=User" class="w-10 h-10 rounded-full border-2 border-blue-500" />
+                <div class="sidebar-text ml-3 opacity-0 overflow-hidden whitespace-nowrap transition-all duration-300">
+                    <p class="text-sm font-medium text-white">Trưởng phòng</p>
+                    <a href="/logout" class="text-xs text-gray-500 hover:text-red-400">Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+        <!-- Content của bạn -->
+    </main>
+</div>
+
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const texts = document.querySelectorAll(".sidebar-text");
+
+        if (sidebar.classList.contains("w-20")) {
+            // Mở rộng
+            sidebar.classList.remove("w-20");
+            sidebar.classList.add("w-64");
+            setTimeout(() => {
+                texts.forEach((t) => t.classList.replace("opacity-0", "opacity-100"));
+            }, 100);
+        } else {
+            // Thu hẹp
+            texts.forEach((t) => t.classList.replace("opacity-100", "opacity-0"));
+            sidebar.classList.remove("w-64");
+            sidebar.classList.add("w-20");
+            // Đóng tất cả menu con khi thu hẹp
+            document.querySelectorAll('[id$="-menu"]').forEach((m) => m.classList.add("hidden"));
+        }
+    }
+
+    function toggleSubmenu(id) {
+        const sidebar = document.getElementById("sidebar");
+        // Chỉ cho phép mở menu con nếu sidebar đang mở rộng
+        if (sidebar.classList.contains("w-64")) {
+            const menu = document.getElementById(id);
+            const arrow = document.getElementById(id.split("-")[0] + "-arrow");
+            menu.classList.toggle("hidden");
+            arrow.classList.toggle("rotate-180");
+        }
+    }
+</script>
