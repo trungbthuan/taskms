@@ -14,7 +14,7 @@ model User {
   password     String    @db.VarChar(255)
   fullName     String?   @db.VarChar(100)
   avatarUrl    String?   @db.VarChar(500)
-  role         String    @default("user")
+  role         String    @default("Employee") // "Admin" | "Manager" | "Employee"
   isActive     Boolean   @default(true)
   isVerified   Boolean   @default(false)
   createdAt    DateTime  @default(now())

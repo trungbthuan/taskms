@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { prisma } from "../config/prisma.js";
+import { getRolePermissions } from "./rbac.middleware.js";
 
 export const authenticate = async (req, res, next) => {
     try {
@@ -39,10 +40,19 @@ export const authenticate = async (req, res, next) => {
             return res.redirect("/api/auth/login");
         }
 
-        req.user = user; // ← các controller sau dùng req.user
+        // Lấy role ưu tiên từ Employee, fallback về User
+        const effectiveRole = user.employee?.role || user.role;
+
+        // Gắn permissions vào req.user để controller dễ dùng
+        req.user = {
+            ...user,
+            effectiveRole,
+            permissions: getRolePermissions(effectiveRole),
+        };
+
         next();
     } catch (error) {
-        return res.redirect("/auth/login");
+        return res.redirect("/api/auth/login");
     }
 };
 

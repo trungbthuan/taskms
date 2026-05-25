@@ -95,12 +95,7 @@ export const login = async (req, res) => {
 
         // Loại bỏ password trước khi truyền vào view
         const { password: _, ...safeUser } = user;
-        res.render("../views/home", {
-            title: "Trang Chủ",
-            message: "Đăng nhập thành công",
-            token,
-            user: safeUser,
-        });
+        res.redirect("/api/tasks/dashboard");
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Lỗi server" });

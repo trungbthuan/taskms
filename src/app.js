@@ -28,6 +28,14 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/employees", employeeRoutes);
 //employeeRoutes;
+
+app.get("/forbidden", (req, res) => {
+    res.status(403).render("forbidden", {
+        title: "Không có quyền",
+        user: req.user ?? null, // null nếu chưa đăng nhập
+    });
+});
+
 app.get("/home", (req, res) => {
     res.render("./home");
 });

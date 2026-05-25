@@ -157,14 +157,26 @@ export const getEmployeeReport = async (req, res) => {
 // Dành cho admin: Lấy danh sách tất cả công việc
 export const getTaskList = async (req, res) => {
     try {
+        const { effectiveRole, employeeId } = req.user;
+
+        // ── Điều kiện lọc theo role ──────────────
+        let whereClause = {};
+
+        if (effectiveRole === "Employee") {
+            // Employee chỉ thấy việc được giao cho mình
+            whereClause = { assigneeId: employeeId };
+        } else if (effectiveRole === "Manager") {
+            // Manager thấy việc của phòng ban mình quản lý
+            whereClause = { managerId: employeeId };
+        }
+        // Admin không có whereClause → thấy tất cả
+
         const tasks = await prisma.task.findMany({
+            where: whereClause,
             include: {
-                assignee: {
-                    select: { id: true, name: true, avatar: true, department: true },
-                },
-                manager: {
-                    select: { id: true, name: true },
-                },
+                assignee: { select: { id: true, name: true, avatar: true, department: true } },
+                manager: { select: { id: true, name: true } },
+                category: { select: { id: true, name: true } },
             },
             orderBy: { assignedDate: "desc" },
         });
@@ -179,6 +191,31 @@ export const getTaskList = async (req, res) => {
         res.status(500).json({ message: "Lỗi server" });
     }
 };
+
+// export const getTaskList = async (req, res) => {
+//     try {
+//         const tasks = await prisma.task.findMany({
+//             include: {
+//                 assignee: {
+//                     select: { id: true, name: true, avatar: true, department: true },
+//                 },
+//                 manager: {
+//                     select: { id: true, name: true },
+//                 },
+//             },
+//             orderBy: { assignedDate: "desc" },
+//         });
+
+//         res.render("../views/task/task-list", {
+//             title: "Danh sách công việc",
+//             user: req.user,
+//             tasks,
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: "Lỗi server" });
+//     }
+// };
 
 export const getTaskDetail = async (req, res) => {
     try {
