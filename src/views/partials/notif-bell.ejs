@@ -1,0 +1,129 @@
+  <!-- Notification Bell -->
+<div style="position:relative; display:inline-block; flex-shrink:0">
+
+    <button id="bellBtn" onclick="toggleNotifPanel()"
+        style="width:36px; height:36px; border-radius:9px; border:1px solid #E2E8F0;
+               background:#fff; color:#334155; cursor:pointer; display:flex;
+               align-items:center; justify-content:center; font-size:18px; position:relative">
+        <i class="ti ti-bell"></i>
+        <% if (locals.notifications && notifications.total > 0) { %>
+          <span style="
+            position:absolute; top:-4px; right:-4px;
+            width:18px; height:18px; border-radius:50%;
+            background:<%= notifications.overdue > 0 ? '#EF4444' : '#F59E0B' %>;
+            color:#fff; font-size:10px; font-weight:700;
+            display:flex; align-items:center; justify-content:center;
+            border:2px solid #fff;">
+            <%= notifications.total %>
+          </span>
+        <% } %>
+    </button>
+
+      <!-- Dropdown panel -->
+    <div id="notifPanel" style="
+        display:none; position:absolute; top:calc(100% + 8px); right:0;
+        width:320px; background:#fff; border-radius:12px;
+        border:1px solid #E2E8F0; box-shadow:0 8px 30px rgba(0,0,0,.12);
+        z-index:500; overflow:hidden;">
+
+        <!-- Header -->
+        <div style="padding:14px 16px; border-bottom:1px solid #F1F5F9;
+                    display:flex; align-items:center; justify-content:space-between">
+          <span style="font-size:14px; font-weight:600; color:#0F172A">
+            <i class="ti ti-bell" style="color:#2563EB; margin-right:6px"></i>
+            Thông báo
+          </span>
+          <% if (locals.notifications && notifications.total > 0) { %>
+            <span style="font-size:11px; font-weight:600; padding:2px 8px;
+                         border-radius:10px; background:#FCEBEB; color:#A32D2D">
+              <%= notifications.total %> việc cần chú ý
+            </span>
+          <% } %>
+        </div>
+
+        <!-- List -->
+        <div style="max-height:320px; overflow-y:auto">
+          <% if (!locals.notifications || notifications.total === 0) { %>
+            <div style="text-align:center; padding:32px 16px; color:#94A3B8">
+              <i class="ti ti-checks" style="font-size:32px; display:block; margin-bottom:8px; color:#3B6D11"></i>
+              <div style="font-size:13px">Không có thông báo nào!</div>
+              <div style="font-size:11px; margin-top:4px">Tất cả công việc đều đúng tiến độ</div>
+            </div>
+          <% } else { %>
+            <% notifications.tasks.forEach(task => { %>
+              <%
+                const dl       = new Date(task.deadline);
+                const now      = new Date();
+                const isOverdue = dl < now;
+                const diffMs   = dl - now;
+                const diffHrs  = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMins = Math.floor(diffMs / (1000 * 60));
+                let timeText;
+                if (isOverdue) {
+                  timeText = 'Đã quá hạn!';
+                } else if (diffHrs < 1) {
+                  timeText = `Còn ${diffMins} phút`;
+                } else {
+                  timeText = `Còn ${diffHrs} giờ`;
+                }
+              %>
+              <a href="/api/tasks/<%= task.id %>"
+                style="display:flex; align-items:flex-start; gap:12px;
+                       padding:12px 16px; border-bottom:1px solid #F8FAFC;
+                       text-decoration:none; transition:background .15s;"
+                onmouseover="this.style.background='#F8FAFC'"
+                onmouseout="this.style.background='transparent'">
+
+                <!-- Icon -->
+                <div style="width:36px; height:36px; border-radius:9px; flex-shrink:0;
+                            background:<%= isOverdue ? '#FCEBEB' : '#FEF3C7' %>;
+                            display:flex; align-items:center; justify-content:center">
+                  <i class="ti ti-<%= isOverdue ? 'alert-circle' : 'clock' %>"
+                     style="font-size:18px; color:<%= isOverdue ? '#EF4444' : '#D97706' %>"></i>
+                </div>
+
+                <!-- Info -->
+                <div style="flex:1; min-width:0">
+                  <div style="font-size:13px; font-weight:500; color:#0F172A;
+                              white-space:nowrap; overflow:hidden; text-overflow:ellipsis">
+                    <%= task.title %>
+                  </div>
+                  <div style="font-size:11px; color:#64748B; margin-top:2px">
+                    <i class="ti ti-user" style="font-size:11px"></i>
+                    <%= task.assignee?.name || 'Chưa gán' %>
+                  </div>
+                  <div style="font-size:11px; font-weight:600; margin-top:3px;
+                              color:<%= isOverdue ? '#EF4444' : '#D97706' %>">
+                    <i class="ti ti-calendar-due" style="font-size:11px"></i>
+                    <%= timeText %>
+                    — <%= dl.toLocaleDateString('vi-VN') %>
+                  </div>
+                </div>
+              </a>
+            <% }) %>
+          <% } %>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding:10px 16px; border-top:1px solid #F1F5F9; text-align:center">
+          <a href="/api/tasks/list" style="font-size:12px; color:#2563EB; font-weight:500">
+            Xem tất cả công việc <i class="ti ti-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+</div>
+<script>
+function toggleNotifPanel() {
+    const panel = document.getElementById('notifPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+// Click ngoài để đóng
+document.addEventListener('click', (e) => {
+    const btn   = document.getElementById('bellBtn');
+    const panel = document.getElementById('notifPanel');
+    if (btn && panel && !btn.contains(e.target) && !panel.contains(e.target)) {
+        panel.style.display = 'none';
+    }
+});
+</script>

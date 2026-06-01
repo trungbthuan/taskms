@@ -63,7 +63,6 @@
                 <i class="ti ti-chevron-down chevron" id="category-chev"></i>
             </button>
             <div class="submenu" id="category-sub">
-                <a href="#" class="sub-item <%= page === 'categories' ? 'active' : '' %>">Danh sách danh mục</a>
                 <a href="/api/categories/new-job" class="sub-item">Thêm công việc mới</a>
             </div>
         <% } %>
@@ -75,12 +74,13 @@
         <% if (['Admin','Manager'].includes(user.effectiveRole)) { %>
             <a href="/api/tasks/home" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
                 <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
-                <span class="nav-label">Thống kê</span>
+                <span class="nav-label">Home</span>
             </a>
-            <a href="/api/tasks/test" class="nav-item">
+            <a href="/api/auth/test" class="nav-item">
                 <span class="nav-icon"><i class="ti ti-file-analytics"></i></span>
-                <span class="nav-label">Báo cáo</span>
+                <span class="nav-label">Trang dùng để test</span>
             </a>
+            
         <% } %>
 
         <div class="divider"></div>
