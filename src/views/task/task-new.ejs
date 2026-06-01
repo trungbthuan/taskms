@@ -14,30 +14,31 @@
         <div class="topbar" style="justify-content:space-between">
             <div style="display:flex; align-items:center; gap:10px">
 
-              <!-- Nút hamburger — chỉ hiện trên mobile -->
-              <button class="hamburger-btn sb-toggle" onclick="openSidebar()"
-                style="display:none; width:34px; height:34px; border-radius:8px;
-                      border:1px solid #E2E8F0; background:#fff; color:#334155;
-                      align-items:center; justify-content:center; cursor:pointer; font-size:18px">
-                <i class="ti ti-menu-2"></i>
-              </button>
-
-              <div>
-                <div class="page-title">Giao công việc mới</div>
+                <!-- Nút hamburger — chỉ hiện trên mobile -->
+                <button class="hamburger-btn sb-toggle" onclick="openSidebar()"
+                    style="display:none; width:34px; height:34px; border-radius:8px;
+                        border:1px solid #E2E8F0; background:#fff; color:#334155;
+                        align-items:center; justify-content:center; cursor:pointer; font-size:18px">
+                    <i class="ti ti-menu-2"></i>
+                </button>
+                <div class="page-title"><h1>Công việc mới</h1></div>
                 <div class="breadcrumb">Giao công việc mới cho nhân viên</div>
-              </div>
             </div>
-
+            
             <!-- Actions bên phải -->
-            <div style="display:flex; align-items:center; gap:8px">
-              <button class="topbar-btn" onclick="location.reload()">
-                <i class="ti ti-refresh"></i>
-              </button>
+            <div class="topbar-actions">
+                <button class="topbar-btn" title="Thông báo">
+                    <i class="ti ti-bell"></i>
+                </button>
+                <button class="topbar-btn" title="Làm mới" onclick="location.reload()">
+                    <i class="ti ti-refresh"></i>
+                </button>
+                <button class="topbar-btn" title="Tùy chọn">
+                    <i class="ti ti-dots"></i>
+                </button>
             </div>
           </div>
         <div style="background:#fff; padding:2rem; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,.06)">
-
-          
 
           <form action="/api/tasks/assign" method="POST" class="space-y-5">
             <div>

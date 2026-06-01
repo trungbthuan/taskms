@@ -1,15 +1,15 @@
-import taskService from "../services/task.service.js";
-import { prisma } from "../config/prisma.js";
+import taskService from '../services/task.service.js';
+import { prisma } from '../config/prisma.js';
 
 export const getHome = async (req, res) => {
     try {
-        res.render("../views/home", {
-            title: "Trang chủ",
+        res.render('../views/home', {
+            title: 'Trang chủ',
             user: req.user,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -21,7 +21,7 @@ export const createTask = async (req, res) => {
     } catch (error) {
         // Trả về lỗi cụ thể từ Model hoặc Service
         res.status(400).json({
-            message: "Dữ liệu không hợp lệ",
+            message: 'Dữ liệu không hợp lệ',
             error: error.message,
         });
     }
@@ -30,17 +30,17 @@ export const createTask = async (req, res) => {
 export const getTask = async (req, res) => {
     try {
         const [categories, employees, jobs] = await Promise.all([
-            prisma.category.findMany({ orderBy: { name: "asc" } }),
+            prisma.category.findMany({ orderBy: { name: 'asc' } }),
             prisma.employee.findMany({
-                where: { role: "Employee" },
-                orderBy: { name: "asc" },
+                where: { role: 'Employee' },
+                orderBy: { name: 'asc' },
             }),
             prisma.job.findMany({
                 include: {
                     category: { select: { id: true, name: true } },
                 },
                 orderBy: {
-                    categoryId: "asc",
+                    categoryId: 'asc',
                 },
             }),
             // Lấy jobs theo category cụ thể
@@ -49,8 +49,8 @@ export const getTask = async (req, res) => {
             // });
         ]);
 
-        res.render("../views/task/task-new", {
-            title: "Giao việc mới",
+        res.render('../views/task/task-new', {
+            title: 'Giao việc mới',
             user: req.user,
             categories, // ← truyền vào view
             employees, // ← thay thế option cứng
@@ -58,7 +58,7 @@ export const getTask = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -68,30 +68,36 @@ export const getUpdateProgress = async (req, res) => {
         const task = await prisma.task.findUnique({
             where: { id: Number(req.params.id) },
             include: {
-                assignee: { select: { id: true, name: true, department: true } },
+                assignee: {
+                    select: { id: true, name: true, department: true },
+                },
                 manager: { select: { id: true, name: true } },
                 category: { select: { id: true, name: true } },
             },
         });
 
         if (!task) {
-            return res.status(404).json({ message: "Không tìm thấy công việc" });
+            return res
+                .status(404)
+                .json({ message: 'Không tìm thấy công việc' });
         }
 
         // Chỉ cho phép assignee hoặc manager cập nhật
         const employeeId = req.user.employeeId;
         if (task.assigneeId !== employeeId && task.managerId !== employeeId) {
-            return res.status(403).json({ message: "Bạn không có quyền cập nhật công việc này" });
+            return res
+                .status(403)
+                .json({ message: 'Bạn không có quyền cập nhật công việc này' });
         }
 
-        res.render("../views/task/task-progress", {
-            title: "Cập nhật tiến độ",
+        res.render('../views/task/task-progress', {
+            title: 'Cập nhật tiến độ',
             user: req.user,
             task,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -105,11 +111,11 @@ export const updateProgress = async (req, res) => {
         // Tự động đặt status dựa trên % tiến độ
         let newStatus = status;
         if (progress === 100) {
-            newStatus = "Completed";
+            newStatus = 'Completed';
         } else if (progress === 0) {
-            newStatus = "Pending";
+            newStatus = 'Pending';
         } else if (!newStatus) {
-            newStatus = "In Progress";
+            newStatus = 'In Progress';
         }
 
         const updatedTask = await prisma.task.update({
@@ -124,7 +130,7 @@ export const updateProgress = async (req, res) => {
         res.redirect(`/api/tasks/list`); // ← sau khi cập nhật xong, quay về danh sách công việc
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -133,11 +139,11 @@ export const evaluateTask = async (req, res) => {
     try {
         const evaluatedTask = await taskService.finishAndRateTask(id, req.body);
         res.json({
-            message: "Sếp đã đánh giá công việc thành công!",
+            message: 'Sếp đã đánh giá công việc thành công!',
             data: evaluatedTask,
         });
     } catch (error) {
-        res.status(400).json({ message: "Lỗi đánh giá", error: error.message });
+        res.status(400).json({ message: 'Lỗi đánh giá', error: error.message });
     }
 };
 
@@ -150,7 +156,10 @@ export const getEmployeeReport = async (req, res) => {
             data: stats,
         });
     } catch (error) {
-        res.status(500).json({ message: "Lỗi khi lấy thống kê", error: error.message });
+        res.status(500).json({
+            message: 'Lỗi khi lấy thống kê',
+            error: error.message,
+        });
     }
 };
 
@@ -162,10 +171,10 @@ export const getTaskList = async (req, res) => {
         // ── Điều kiện lọc theo role ──────────────
         let whereClause = {};
 
-        if (effectiveRole === "Employee") {
+        if (effectiveRole === 'Employee') {
             // Employee chỉ thấy việc được giao cho mình
             whereClause = { assigneeId: employeeId };
-        } else if (effectiveRole === "Manager") {
+        } else if (effectiveRole === 'Manager') {
             // Manager thấy việc của phòng ban mình quản lý
             whereClause = { managerId: employeeId };
         }
@@ -174,21 +183,28 @@ export const getTaskList = async (req, res) => {
         const tasks = await prisma.task.findMany({
             where: whereClause,
             include: {
-                assignee: { select: { id: true, name: true, avatar: true, department: true } },
+                assignee: {
+                    select: {
+                        id: true,
+                        name: true,
+                        avatar: true,
+                        department: true,
+                    },
+                },
                 manager: { select: { id: true, name: true } },
                 category: { select: { id: true, name: true } },
             },
-            orderBy: { assignedDate: "desc" },
+            orderBy: { assignedDate: 'desc' },
         });
 
-        res.render("../views/task/task-list", {
-            title: "Danh sách công việc",
+        res.render('../views/task/task-list', {
+            title: 'Danh sách công việc',
             user: req.user,
             tasks,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -222,74 +238,92 @@ export const getTaskDetail = async (req, res) => {
         const task = await prisma.task.findUnique({
             where: { id: Number(req.params.id) },
             include: {
-                assignee: { select: { id: true, name: true, department: true, avatar: true } },
+                assignee: {
+                    select: {
+                        id: true,
+                        name: true,
+                        department: true,
+                        avatar: true,
+                    },
+                },
                 manager: { select: { id: true, name: true, department: true } },
                 category: { select: { id: true, name: true } },
             },
         });
 
         if (!task) {
-            return res.status(404).json({ message: "Không tìm thấy công việc" });
+            return res
+                .status(404)
+                .json({ message: 'Không tìm thấy công việc' });
         }
 
-        res.render("../views/task/task-detail", {
+        res.render('../views/task/task-detail', {
             title: task.title,
             user: req.user,
             task,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
 export const getDashboard = async (req, res) => {
     try {
-        const [total, inProgress, completed, stuck, recentTasks] = await Promise.all([
-            // Tổng công việc
-            prisma.task.count(),
+        const [total, inProgress, completed, stuck, recentTasks] =
+            await Promise.all([
+                // Tổng công việc
+                prisma.task.count(),
 
-            // Đang xử lý
-            prisma.task.count({ where: { status: "In Progress" } }),
+                // Đang xử lý
+                prisma.task.count({ where: { status: 'In Progress' } }),
 
-            // Hoàn thành
-            prisma.task.count({ where: { status: "Completed" } }),
+                // Hoàn thành
+                prisma.task.count({ where: { status: 'Completed' } }),
 
-            // Vướng mắc
-            prisma.task.count({ where: { status: "Stuck" } }),
+                // Vướng mắc
+                prisma.task.count({ where: { status: 'Stuck' } }),
 
-            // 5 công việc gần đây
-            prisma.task.findMany({
-                take: 5,
-                orderBy: { assignedDate: "desc" },
-                include: {
-                    assignee: { select: { name: true, avatar: true } },
-                    manager: { select: { name: true } },
-                },
-            }),
-        ]);
+                // 5 công việc gần đây
+                prisma.task.findMany({
+                    take: 5,
+                    orderBy: { assignedDate: 'desc' },
+                    include: {
+                        assignee: { select: { name: true, avatar: true } },
+                        manager: { select: { name: true } },
+                    },
+                }),
+            ]);
 
         // Sắp hết hạn (deadline trong 3 ngày tới, chưa hoàn thành)
         const threeDaysLater = new Date();
         threeDaysLater.setDate(threeDaysLater.getDate() + 3);
         const nearDeadline = await prisma.task.count({
             where: {
-                status: { notIn: ["Completed"] },
+                status: { notIn: ['Completed'] },
                 deadline: { lte: threeDaysLater },
             },
         });
 
-        const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+        const completionRate =
+            total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        res.render("../views/dashboard", {
-            title: "Dashboard",
+        res.render('../views/dashboard', {
+            title: 'Dashboard',
             user: req.user,
-            stats: { total, inProgress, completed, stuck, nearDeadline, completionRate },
+            stats: {
+                total,
+                inProgress,
+                completed,
+                stuck,
+                nearDeadline,
+                completionRate,
+            },
             recentTasks,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -299,47 +333,59 @@ export const deleteTask = async (req, res) => {
             where: { id: Number(req.params.id) },
         });
 
-        res.status(200).json({ message: "Xóa thành công" }); // ← trả về 200 rõ ràng
+        res.status(200).json({ message: 'Xóa thành công' }); // ← trả về 200 rõ ràng
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Xóa thất bại", error: error.message });
+        res.status(500).json({ message: 'Xóa thất bại', error: error.message });
     }
 };
 
 // ─── HIỂN THỊ FORM SỬA ─────────────────────────────────
 export const getTaskEdit = async (req, res) => {
     try {
-        const [task, categories, employees, managers, jobs] = await Promise.all([
-            prisma.task.findUnique({
-                where: { id: Number(req.params.id) },
-                include: {
-                    assignee: { select: { id: true, name: true } },
-                    manager: { select: { id: true, name: true } },
-                    category: { select: { id: true, name: true } },
-                },
-            }),
-            prisma.category.findMany({ orderBy: { name: "asc" } }),
-            prisma.employee.findMany({ where: { role: "Employee" }, orderBy: { name: "asc" } }),
-            prisma.employee.findMany({ where: { role: "Manager" }, orderBy: { name: "asc" } }),
-            prisma.job.findMany({
-                include: {
-                    category: { select: { id: true, name: true } },
-                },
-                orderBy: {
-                    categoryId: "asc",
-                },
-            }),
-        ]);
+        const [task, categories, employees, managers, jobs] = await Promise.all(
+            [
+                prisma.task.findUnique({
+                    where: { id: Number(req.params.id) },
+                    include: {
+                        assignee: { select: { id: true, name: true } },
+                        manager: { select: { id: true, name: true } },
+                        category: { select: { id: true, name: true } },
+                    },
+                }),
+                prisma.category.findMany({ orderBy: { name: 'asc' } }),
+                prisma.employee.findMany({
+                    where: { role: 'Employee' },
+                    orderBy: { name: 'asc' },
+                }),
+                prisma.employee.findMany({
+                    where: { role: 'Manager' },
+                    orderBy: { name: 'asc' },
+                }),
+                prisma.job.findMany({
+                    include: {
+                        category: { select: { id: true, name: true } },
+                    },
+                    orderBy: {
+                        categoryId: 'asc',
+                    },
+                }),
+            ],
+        );
 
         if (!task) {
-            return res.status(404).json({ message: "Không tìm thấy công việc" });
+            return res
+                .status(404)
+                .json({ message: 'Không tìm thấy công việc' });
         }
 
         // Format deadline về YYYY-MM-DD cho input type="date"
-        const deadlineFormatted = task.deadline ? new Date(task.deadline).toISOString().slice(0, 10) : "";
+        const deadlineFormatted = task.deadline
+            ? new Date(task.deadline).toISOString().slice(0, 10)
+            : '';
 
-        res.render("../views/task/task-edit", {
-            title: "Chỉnh sửa công việc",
+        res.render('../views/task/task-edit', {
+            title: 'Chỉnh sửa công việc',
             user: req.user,
             task,
             categories,
@@ -350,7 +396,7 @@ export const getTaskEdit = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
@@ -358,10 +404,19 @@ export const getTaskEdit = async (req, res) => {
 export const updateTask = async (req, res) => {
     try {
         const id = Number(req.params.id);
-        const { title, description, categoryId, assigneeId, managerId, deadline, status, progressPercent } = req.body;
+        const {
+            title,
+            description,
+            categoryId,
+            assigneeId,
+            managerId,
+            deadline,
+            status,
+            progressPercent,
+        } = req.body;
 
         // Tự động cập nhật completedDate
-        const isCompleted = status === "Completed";
+        const isCompleted = status === 'Completed';
         const completedDate = isCompleted ? new Date() : null;
 
         await prisma.task.update({
@@ -382,37 +437,37 @@ export const updateTask = async (req, res) => {
         res.redirect(`/api/tasks/${id}/detail`); // ← về trang chi tiết sau khi lưu
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
+        res.status(500).json({ message: 'Lỗi server' });
     }
 };
 
-export const getJobNew = async (req, res) => {
-    try {
-        const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
-        res.render("../views/task/job-new", {
-            title: "Tạo công việc mới",
-            user: req.user,
-            categories,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
-    }
-};
+// export const getJobNew = async (req, res) => {
+//     try {
+//         const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+//         res.render("../views/task/job-new", {
+//             title: "Tạo công việc mới",
+//             user: req.user,
+//             categories,
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: "Lỗi server" });
+//     }
+// };
 
-export const createJob = async (req, res) => {
-    try {
-        const { title, description, categoryId } = req.body;
-        await prisma.job.create({
-            data: {
-                title,
-                description: description || null,
-                categoryId: Number(categoryId),
-            },
-        });
-        res.redirect("/api/tasks/new-job"); // ← sau khi tạo xong, quay về form tạo công việc mới
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Lỗi server" });
-    }
-};
+// export const createJob = async (req, res) => {
+//     try {
+//         const { title, description, categoryId } = req.body;
+//         await prisma.job.create({
+//             data: {
+//                 title,
+//                 description: description || null,
+//                 categoryId: Number(categoryId),
+//             },
+//         });
+//         res.redirect("/api/tasks/new-job"); // ← sau khi tạo xong, quay về form tạo công việc mới
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: "Lỗi server" });
+//     }
+// };

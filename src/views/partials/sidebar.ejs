@@ -54,6 +54,20 @@
                 <a href="/api/employees/assign" class="sub-item">Phân công</a>
             </div>
         <% } %>
+
+        <!-- Danh mục — chỉ Manager+ -->
+        <% if (['Admin','Manager'].includes(user.effectiveRole)) { %>
+            <button class="nav-item" onclick="toggleSub('category-sub', 'category-chev')">
+                <span class="nav-icon"><i class="ti ti-tag"></i></span>
+                <span class="nav-label">Danh mục</span>
+                <i class="ti ti-chevron-down chevron" id="category-chev"></i>
+            </button>
+            <div class="submenu" id="category-sub">
+                <a href="#" class="sub-item <%= page === 'categories' ? 'active' : '' %>">Danh sách danh mục</a>
+                <a href="/api/categories/new-job" class="sub-item">Thêm công việc mới</a>
+            </div>
+        <% } %>
+
         <div class="divider"></div>
         <div class="nav-section">BÁO CÁO</div>
         
