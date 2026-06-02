@@ -205,32 +205,7 @@
 <div class="app">
   <%- include('../partials/sidebar', { page: 'jobs', user: user }) %>
   <div class="main">
-    <div class="topbar" style="justify-content:space-between">
-        <div style="display:flex; align-items:center; gap:10px">
-
-            <!-- Nút hamburger — chỉ hiện trên mobile -->
-            <button class="hamburger-btn sb-toggle" onclick="openSidebar()"
-                style="display:none; width:34px; height:34px; border-radius:8px;
-                        border:1px solid #E2E8F0; background:#fff; color:#334155;
-                        align-items:center; justify-content:center; cursor:pointer; font-size:18px">
-                <i class="ti ti-menu-2"></i>
-            </button>
-          <div class="page-title">Thêm công việc mới</div>
-          <div class="breadcrumb">Quản lý / Danh mục công việc / Thêm mới</div>
-        </div>
-        <!-- Actions bên phải -->
-        <div class="topbar-actions">
-            <button class="topbar-btn" title="Thông báo">
-                <i class="ti ti-bell"></i>
-            </button>
-            <button class="topbar-btn" title="Làm mới" onclick="location.reload()">
-                <i class="ti ti-refresh"></i>
-            </button>
-            <button class="topbar-btn" title="Tùy chọn">
-                <i class="ti ti-dots"></i>
-            </button>
-        </div>
-    </div>
+        <%- include('../partials/topbar', { pageTitle: 'Thêm công việc mới', breadcrumb: 'Quản lý / Danh mục công việc / Thêm mới' }) %>
 
     <div class="content">
       <div class="form-wrap">

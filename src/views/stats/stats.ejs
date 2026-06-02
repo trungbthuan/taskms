@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <%- include('../partials/head') %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+    const monthlyRaw   = <%- chartData.monthly %>;
+    const completedRaw = <%- chartData.completed %>;
+    const statusRaw    = <%- chartData.status %>;
+
+    const labels = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+
+    Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    Chart.defaults.font.size   = 12;
+    Chart.defaults.color       = '#64748B';
+
+    // ── Biểu đồ cột ──────────────────────────
+    const monthlyCtx   = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyChart = new Chart(monthlyCtx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label:           'Tổng công việc',
+                    data:            monthlyRaw,
+                    backgroundColor: 'rgba(37,99,235,.15)',
+                    borderColor:     '#2563EB',
+                    borderWidth:     2,
+                    borderRadius:    6,
+                    borderSkipped:   false,
+                },
+                {
+                    label:           'Hoàn thành',
+                    data:            completedRaw,
+                    backgroundColor: 'rgba(59,109,17,.15)',
+                    borderColor:     '#3B6D11',
+                    borderWidth:     2,
+                    borderRadius:    6,
+                    borderSkipped:   false,
+                },
+            ],
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,  // ← quan trọng khi dùng height cố định
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels:   { usePointStyle: true, pointStyle: 'circle', padding: 16 },
+                },
+                tooltip: {
+                    backgroundColor: '#0F172A',
+                    padding:         10,
+                    cornerRadius:    8,
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} việc`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    grid:   { display: false },
+                    border: { display: false },
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks:       { stepSize: 1, precision: 0 },
+                    grid:        { color: '#F1F5F9' },
+                    border:      { display: false },
+                },
+            },
+        },
+    });
+
+    // ── Filter ───────────────────────────────
+    window.filterChart = (range, btn) => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        let fl, fm, fc;
+        if (range === 'h1') {
+            fl = labels.slice(0, 6); fm = monthlyRaw.slice(0, 6); fc = completedRaw.slice(0, 6);
+        } else if (range === 'h2') {
+            fl = labels.slice(6);    fm = monthlyRaw.slice(6);    fc = completedRaw.slice(6);
+        } else {
+            fl = labels; fm = monthlyRaw; fc = completedRaw;
+        }
+
+        monthlyChart.data.labels            = fl;
+        monthlyChart.data.datasets[0].data  = fm;
+        monthlyChart.data.datasets[1].data  = fc;
+        monthlyChart.update('active');
+    };
+
+    // ── Biểu đồ tròn ─────────────────────────
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Chờ thực hiện','Đang thực hiện','Hoàn thành','Vướng mắc'],
+            datasets: [{
+                data: [
+                    statusRaw.Pending        || 0,
+                    statusRaw['In Progress'] || 0,
+                    statusRaw.Completed      || 0,
+                    statusRaw.Stuck          || 0,
+                ],
+                backgroundColor: ['#94A3B8','#2563EB','#3B6D11','#EF4444'],
+                borderWidth:     0,
+                hoverOffset:     6,
+            }],
+        },
+        options: {
+            responsive:          true,
+            maintainAspectRatio: false,
+            cutout:              '72%',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#0F172A',
+                    padding:         10,
+                    cornerRadius:    8,
+                    callbacks: {
+                        label: ctx => ` ${ctx.label}: ${ctx.raw} việc`,
+                    },
+                },
+            },
+        },
+    });
+
+}); // end DOMContentLoaded
+  </script> -->
+  <style>
+    /* ── Summary cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .summary-card {
+      background: #fff; border: 1px solid #E2E8F0;
+      border-radius: 12px; padding: 18px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .summary-icon {
+      width: 44px; height: 44px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .summary-label { font-size: 12px; color: #64748B; margin-bottom: 4px; }
+    .summary-val   { font-size: 26px; font-weight: 700; color: #0F172A; line-height: 1; }
+    .summary-sub   { font-size: 11px; margin-top: 4px; font-weight: 500; }
+
+    /* ── Chart grid ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .chart-card {
+      background: #fff; border: 1px solid #E2E8F0;
+      border-radius: 12px; padding: 20px;
+    }
+    .chart-header {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 20px;
+    }
+    .chart-title {
+      font-size: 14px; font-weight: 600; color: #0F172A;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .chart-year {
+      font-size: 12px; color: #64748B;
+      background: #F1F5F9; padding: 4px 10px;
+      border-radius: 6px; font-weight: 500;
+    }
+    .chart-wrap {
+        position: relative;
+        height: 280px;      /* ← quan trọng */
+        width: 100%;
+    }
+
+    /* ── Employee table ── */
+    .emp-table-card {
+      background: #fff; border: 1px solid #E2E8F0;
+      border-radius: 12px; overflow: hidden;
+    }
+    .emp-table-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid #F1F5F9;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 10px 16px; text-align: left;
+      font-size: 11px; font-weight: 600; color: #64748B;
+      text-transform: uppercase; letter-spacing: .05em;
+      background: #F8FAFC; border-bottom: 1px solid #E2E8F0;
+    }
+    tbody tr { transition: background .15s; }
+    tbody tr:hover { background: #F8FAFC; }
+    tbody td {
+      padding: 12px 16px; font-size: 13px;
+      color: #334155; border-bottom: 1px solid #F1F5F9;
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border: none; }
+
+    /* Rate bar */
+    .rate-wrap { display: flex; align-items: center; gap: 8px; }
+    .rate-bg   { flex: 1; background: #E2E8F0; border-radius: 4px; height: 6px; }
+    .rate-fill { height: 6px; border-radius: 4px; transition: width .3s; }
+    .rate-val  { font-size: 12px; font-weight: 600; width: 34px; text-align: right; }
+
+    /* Rank badge */
+    .rank {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff;
+    }
+
+    /* ── Filter bar ── */
+    .filter-bar {
+      display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 6px 14px; border-radius: 20px; font-size: 12px;
+      font-weight: 500; cursor: pointer; border: 1px solid #E2E8F0;
+      background: #fff; color: #475569; transition: all .15s;
+    }
+    .filter-btn.active {
+      background: #1B2A4A; color: #fff; border-color: #1B2A4A;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid   { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <%- include('../partials/sidebar', { page: 'stats', user: user }) %>
+
+  <div class="main">
+    <%- include('../partials/topbar', {
+      pageTitle: 'Thống kê',
+      breadcrumb: 'Báo cáo / Thống kê'
+    }) %>
+
+    <div class="content">
+
+      <!-- ── Summary ── -->
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-icon" style="background:#EFF6FF">
+            <i class="ti ti-clipboard-list" style="color:#2563EB"></i>
+          </div>
+          <div>
+            <div class="summary-label">Tổng công việc</div>
+            <div class="summary-val"><%= summary.total %></div>
+            <div class="summary-sub" style="color:#64748B">Năm <%= currentYear %></div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon" style="background:#EAF3DE">
+            <i class="ti ti-circle-check" style="color:#3B6D11"></i>
+          </div>
+          <div>
+            <div class="summary-label">Hoàn thành</div>
+            <div class="summary-val"><%= summary.completed %></div>
+            <div class="summary-sub" style="color:#3B6D11">
+              Tỷ lệ <%= summary.completionRate %>%
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon" style="background:#FEF3C7">
+            <i class="ti ti-loader" style="color:#D97706"></i>
+          </div>
+          <div>
+            <div class="summary-label">Đang xử lý</div>
+            <div class="summary-val"><%= summary.inProgress %></div>
+            <div class="summary-sub" style="color:#D97706">In Progress</div>
+          </div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-icon" style="background:#FCEBEB">
+            <i class="ti ti-alert-triangle" style="color:#EF4444"></i>
+          </div>
+          <div>
+            <div class="summary-label">Quá hạn</div>
+            <div class="summary-val"><%= summary.overdue %></div>
+            <div class="summary-sub" style="color:#EF4444">Cần xử lý ngay</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Charts ── -->
+      <div class="chart-grid">
+
+        <!-- Biểu đồ cột theo tháng -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <i class="ti ti-chart-bar" style="color:#2563EB"></i>
+              Công việc theo tháng
+            </div>
+            <span class="chart-year">Năm <%= currentYear %></span>
+          </div>
+
+          <!-- Filter nửa năm / cả năm -->
+          <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterChart('all', this)">Cả năm</button>
+            <button class="filter-btn" onclick="filterChart('h1', this)">6 tháng đầu</button>
+            <button class="filter-btn" onclick="filterChart('h2', this)">6 tháng cuối</button>
+          </div>
+
+          <div class="chart-wrap" style="position:relative; height:280px">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Biểu đồ tròn trạng thái -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">
+              <i class="ti ti-chart-pie" style="color:#2563EB"></i>
+              Trạng thái
+            </div>
+          </div>
+          <!-- Biểu đồ tròn -->
+          <div class="chart-wrap" style="position:relative; height:200px">
+            <canvas id="statusChart"></canvas>
+          </div>
+
+          <!-- Legend -->
+          <div style="margin-top:16px; display:flex; flex-direction:column; gap:8px">
+            <% const statusData = JSON.parse(chartData.status); %>
+            <% const statusItems = [
+              { label: 'Chờ thực hiện', key: 'Pending',     color: '#94A3B8' },
+              { label: 'Đang thực hiện', key: 'In Progress', color: '#2563EB' },
+              { label: 'Hoàn thành',    key: 'Completed',   color: '#3B6D11' },
+              { label: 'Vướng mắc',     key: 'Stuck',       color: '#EF4444' },
+            ] %>
+            <% statusItems.forEach(item => { %>
+              <div style="display:flex; align-items:center; justify-content:space-between; font-size:12px">
+                <span style="display:flex; align-items:center; gap:8px; color:#334155">
+                  <span style="width:10px; height:10px; border-radius:50%;
+                               background:<%= item.color %>; display:inline-block"></span>
+                  <%= item.label %>
+                </span>
+                <span style="font-weight:600; color:#0F172A"><%= statusData[item.key] || 0 %></span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Employee performance table ── -->
+      <div class="emp-table-card">
+        <div class="emp-table-head">
+          <span style="font-size:14px; font-weight:600; color:#0F172A; display:flex; align-items:center; gap:8px">
+            <i class="ti ti-trophy" style="color:#F59E0B"></i>
+            Hiệu suất nhân viên
+          </span>
+          <span style="font-size:12px; color:#64748B">Top <%= employeeStats.length %> nhân viên</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nhân viên</th>
+                <th>Phòng ban</th>
+                <th>Tổng việc</th>
+                <th>Hoàn thành</th>
+                <th>Tỷ lệ hoàn thành</th>
+                <th>Tiến độ TB</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% employeeStats.forEach((emp, i) => { %>
+                <tr>
+                  <td>
+                    <div class="rank" style="background:<%= i===0?'#F59E0B':i===1?'#94A3B8':i===2?'#CD7C2F':'#E2E8F0' %>; color:<%= i<3?'#fff':'#64748B' %>">
+                      <%= i + 1 %>
+                    </div>
+                  </td>
+                  <td>
+                    <div style="display:flex; align-items:center; gap:8px">
+                      <div style="width:30px; height:30px; border-radius:50%;
+                                  background:#2563EB; color:#fff; display:flex;
+                                  align-items:center; justify-content:center;
+                                  font-size:12px; font-weight:700; flex-shrink:0">
+                        <%= emp.name.charAt(0).toUpperCase() %>
+                      </div>
+                      <span style="font-weight:500; color:#0F172A"><%= emp.name %></span>
+                    </div>
+                  </td>
+                  <td style="color:#64748B"><%= emp.department %></td>
+                  <td style="text-align:center; font-weight:600"><%= emp.total %></td>
+                  <td style="text-align:center">
+                    <span style="font-weight:600; color:#3B6D11"><%= emp.completed %></span>
+                  </td>
+                  <td style="min-width:140px">
+                    <div class="rate-wrap">
+                      <div class="rate-bg">
+                        <div class="rate-fill"
+                          style="width:<%= emp.rate %>%;
+                                 background:<%= emp.rate>=80?'#3B6D11':emp.rate>=50?'#D97706':'#EF4444' %>">
+                        </div>
+                      </div>
+                      <span class="rate-val"
+                        style="color:<%= emp.rate>=80?'#3B6D11':emp.rate>=50?'#D97706':'#EF4444' %>">
+                        <%= emp.rate %>%
+                      </span>
+                    </div>
+                  </td>
+                  <td style="text-align:center">
+                    <span style="font-size:13px; font-weight:600; color:#2563EB">
+                      <%= emp.avgProgress %>%
+                    </span>
+                  </td>
+                </tr>
+              <% }) %>
+              <% if (employeeStats.length === 0) { %>
+                <tr>
+                  <td colspan="7" style="text-align:center; padding:32px; color:#94A3B8">
+                    <i class="ti ti-users-off" style="font-size:28px; display:block; margin-bottom:8px"></i>
+                    Chưa có dữ liệu nhân viên
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const monthlyRaw   = <%- chartData.monthly %>;
+        const completedRaw = <%- chartData.completed %>;
+        const statusRaw    = <%- chartData.status %>;
+
+        const labels = ['T1','T2','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12'];
+
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+        Chart.defaults.font.size   = 12;
+        Chart.defaults.color       = '#64748B';
+
+        // ── Biểu đồ cột ──────────────────────────
+        const monthlyCtx   = document.getElementById('monthlyChart').getContext('2d');
+        const monthlyChart = new Chart(monthlyCtx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label:           'Tổng công việc',
+                        data:            monthlyRaw,
+                        backgroundColor: 'rgba(37,99,235,.15)',
+                        borderColor:     '#2563EB',
+                        borderWidth:     2,
+                        borderRadius:    6,
+                        borderSkipped:   false,
+                    },
+                    {
+                        label:           'Hoàn thành',
+                        data:            completedRaw,
+                        backgroundColor: 'rgba(59,109,17,.15)',
+                        borderColor:     '#3B6D11',
+                        borderWidth:     2,
+                        borderRadius:    6,
+                        borderSkipped:   false,
+                    },
+                ],
+            },
+            options: {
+                responsive:          true,
+                maintainAspectRatio: false,  // ← quan trọng khi dùng height cố định
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels:   { usePointStyle: true, pointStyle: 'circle', padding: 16 },
+                    },
+                    tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding:         10,
+                        cornerRadius:    8,
+                        callbacks: {
+                            label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} việc`,
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        grid:   { display: false },
+                        border: { display: false },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks:       { stepSize: 1, precision: 0 },
+                        grid:        { color: '#F1F5F9' },
+                        border:      { display: false },
+                    },
+                },
+            },
+        });
+
+        // ── Filter ───────────────────────────────
+        window.filterChart = (range, btn) => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            let fl, fm, fc;
+            if (range === 'h1') {
+                fl = labels.slice(0, 6); fm = monthlyRaw.slice(0, 6); fc = completedRaw.slice(0, 6);
+            } else if (range === 'h2') {
+                fl = labels.slice(6);    fm = monthlyRaw.slice(6);    fc = completedRaw.slice(6);
+            } else {
+                fl = labels; fm = monthlyRaw; fc = completedRaw;
+            }
+
+            monthlyChart.data.labels            = fl;
+            monthlyChart.data.datasets[0].data  = fm;
+            monthlyChart.data.datasets[1].data  = fc;
+            monthlyChart.update('active');
+        };
+
+        // ── Biểu đồ tròn ─────────────────────────
+        const statusCtx = document.getElementById('statusChart').getContext('2d');
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Chờ thực hiện','Đang thực hiện','Hoàn thành','Vướng mắc'],
+                datasets: [{
+                    data: [
+                        statusRaw.Pending        || 0,
+                        statusRaw['In Progress'] || 0,
+                        statusRaw.Completed      || 0,
+                        statusRaw.Stuck          || 0,
+                    ],
+                    backgroundColor: ['#94A3B8','#2563EB','#3B6D11','#EF4444'],
+                    borderWidth:     0,
+                    hoverOffset:     6,
+                }],
+            },
+            options: {
+                responsive:          true,
+                maintainAspectRatio: false,
+                cutout:              '72%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0F172A',
+                        padding:         10,
+                        cornerRadius:    8,
+                        callbacks: {
+                            label: ctx => ` ${ctx.label}: ${ctx.raw} việc`,
+                        },
+                    },
+                },
+            },
+        });
+
+    }); // end DOMContentLoaded
+  </script> 
+</body>
+</html>

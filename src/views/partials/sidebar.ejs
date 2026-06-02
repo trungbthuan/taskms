@@ -72,9 +72,13 @@
         
         <!-- Báo cáo — chỉ Manager+ -->
         <% if (['Admin','Manager'].includes(user.effectiveRole)) { %>
-            <a href="/api/tasks/home" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
+            <a href="/api/stats" class="nav-item <%= page === 'stats' ? 'active' : '' %>">
                 <span class="nav-icon"><i class="ti ti-chart-bar"></i></span>
-                <span class="nav-label">Home</span>
+                <span class="nav-label">Thông kê</span>
+            </a>
+            <a href="/home" class="nav-item <%= page === 'home' ? 'active' : '' %>">
+                <span class="nav-icon"><i class="ti ti-home"></i></span>
+                <span class="nav-label">Home page</span>
             </a>
             <a href="/api/auth/test" class="nav-item">
                 <span class="nav-icon"><i class="ti ti-file-analytics"></i></span>

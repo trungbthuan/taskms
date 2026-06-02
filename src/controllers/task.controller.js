@@ -258,7 +258,7 @@ export const getTaskDetail = async (req, res) => {
         }
 
         res.render('../views/task/task-detail', {
-            title: task.title,
+            title: 'task.title',
             user: req.user,
             task,
         });

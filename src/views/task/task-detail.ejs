@@ -156,34 +156,8 @@
   <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
 
   <div class="main">
-    <div class="topbar" style="justify-content:space-between">
-      <div style="display:flex; align-items:center; gap:10px">
-
-        <!-- Nút hamburger — chỉ hiện trên mobile -->
-        <button class="hamburger-btn sb-toggle" onclick="openSidebar()"
-          style="display:none; width:34px; height:34px; border-radius:8px;
-                border:1px solid #E2E8F0; background:#fff; color:#334155;
-                align-items:center; justify-content:center; cursor:pointer; font-size:18px">
-          <i class="ti ti-menu-2"></i>
-        </button>
-
-        <div>
-          <div class="page-title">Chi tiết công việc</div>
-          <div class="breadcrumb">Công việc / Chi tiết</div>
-        </div>
-      </div>
-
-      <div style="display:flex; align-items:center; gap:8px">
-        <button class="topbar-btn" onclick="location.reload()">
-          <i class="ti ti-refresh"></i>
-        </button>
-      </div>
-
-      <a href="/api/tasks" style="font-size:13px; color:#2563EB; text-decoration:none; display:flex; align-items:center; gap:4px">
-        <i class="ti ti-arrow-left"></i> Quay lại
-      </a>
-    </div>
-
+    <%- include('../partials/topbar', { pageTitle: 'Chi tiết công việc', breadcrumb: 'Công việc / Chi tiết' }) %>
+    
     <div class="content">
       <div class="detail-wrap">
 
