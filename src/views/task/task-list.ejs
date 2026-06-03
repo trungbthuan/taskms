@@ -1,270 +1,513 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <%- include('../partials/head', { title: 'Danh sách công việc' }) %>
-  <style>
-    /* ── Table ── */
-    .table-wrap { background:#fff; border-radius:10px; border:1px solid #E2E8F0; overflow:hidden; }
-    .table-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #E2E8F0; }
-    .table-title { font-size:15px; font-weight:600; color:#0F172A; }
-    .btn-add { display:flex; align-items:center; gap:6px; padding:8px 16px; background:#2563EB; color:#fff; border:none; border-radius:7px; font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; }
-    .btn-add:hover { background:#1D4ED8; }
-
-    /* Filter bar */
-    .filter-bar { display:flex; gap:10px; padding:12px 20px; border-bottom:1px solid #F1F5F9; flex-wrap:wrap; }
-    .filter-select { height:34px; padding:0 10px; border:1px solid #E2E8F0; border-radius:7px; font-size:13px; color:#334155; background:#fff; outline:none; cursor:pointer; }
-    .filter-select:focus { border-color:#2563EB; }
-    .search-box { display:flex; align-items:center; gap:8px; border:1px solid #E2E8F0; border-radius:7px; padding:0 10px; height:34px; flex:1; min-width:180px; }
-    .search-box input { border:none; outline:none; font-size:13px; color:#334155; width:100%; background:transparent; }
-    .search-box i { color:#94A3B8; font-size:16px; }
-
-    /* Table */
-    table { width:100%; border-collapse:collapse; }
-    thead th { padding:11px 16px; text-align:left; font-size:11px; font-weight:600; color:#64748B; text-transform:uppercase; letter-spacing:.05em; background:#F8FAFC; border-bottom:1px solid #E2E8F0; white-space:nowrap; }
-    tbody tr { transition:background .15s; }
-    tbody tr:hover { background:#F8FAFC; }
-    tbody td { padding:12px 16px; font-size:13px; color:#334155; border-bottom:1px solid #F1F5F9; vertical-align:middle; }
-    tbody tr:last-child td { border-bottom:none; }
-
-    /* Avatar + name */
-    .assignee-cell { display:flex; align-items:center; gap:8px; }
-    .avatar-sm { width:28px; height:28px; border-radius:50%; object-fit:cover; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#fff; background:#2563EB; flex-shrink:0; }
-
-    /* Status badge */
-    .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
-    .badge-pending    { background:#F1F5F9; color:#475569; }
-    .badge-progress   { background:#EFF6FF; color:#1D4ED8; }
-    .badge-completed  { background:#EAF3DE; color:#27500A; }
-    .badge-stuck      { background:#FCEBEB; color:#A32D2D; }
-
-    /* Priority dot */
-    .progress-bar-wrap { width:80px; }
-    .progress-bar-bg { background:#E2E8F0; border-radius:4px; height:5px; }
-    .progress-bar-fill { height:5px; border-radius:4px; background:#2563EB; transition:width .3s; }
-
-    /* Action buttons */
-    .action-btns { display:flex; gap:6px; }
-    .btn-icon { width:28px; height:28px; border-radius:6px; border:1px solid #E2E8F0; background:#fff; color:#64748B; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:15px; transition:all .15s; text-decoration:none; }
-    .btn-icon:hover { border-color:#2563EB; color:#2563EB; background:#EFF6FF; }
-    .btn-icon.danger:hover { border-color:#EF4444; color:#EF4444; background:#FCEBEB; }
-
-    /* Empty state */
-    .empty-state { text-align:center; padding:48px 20px; color:#94A3B8; }
-    .empty-state i { font-size:40px; margin-bottom:12px; display:block; }
-
-    /* Pagination */
-    .pagination { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-top:1px solid #E2E8F0; }
-    .page-info { font-size:13px; color:#64748B; }
-    .page-btns { display:flex; gap:4px; }
-    .page-btn { height:30px; min-width:30px; padding:0 8px; border:1px solid #E2E8F0; border-radius:6px; background:#fff; color:#334155; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    .page-btn.active { background:#2563EB; color:#fff; border-color:#2563EB; }
-    .page-btn:hover:not(.active) { border-color:#2563EB; color:#2563EB; }
-  </style>
-</head>
-<body>
-<div class="app">
-  <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
-
-  <div class="main">
-    <%- include('../partials/topbar', { pageTitle: title, breadcrumb: 'Công việc / Danh sách' }) %>
-    
-
-    <div class="content">
-      <div class="table-wrap">
-
-        <!-- Header -->
-        <div class="table-header">
-          <span class="table-title">
-            <i class="ti ti-checklist" style="color:#2563EB; margin-right:6px"></i>
-            Tất cả công việc
-            <span style="font-size:12px; color:#64748B; font-weight:400; margin-left:6px">(<%= tasks.length %> việc)</span>
-          </span>
-          <a href="/api/tasks/new" class="btn-add">
-            <i class="ti ti-plus"></i> Giao việc mới
-          </a>
-        </div>
-
-        <!-- Filter bar -->
-        <div class="filter-bar">
-          <div class="search-box">
-            <i class="ti ti-search"></i>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm công việc...">
-          </div>
-          <select class="filter-select" id="filterStatus">
-            <option value="">Tất cả trạng thái</option>
-            <option value="Pending">Chờ thực hiện</option>
-            <option value="In Progress">Đang thực hiện</option>
-            <option value="Completed">Hoàn thành</option>
-            <option value="Stuck">Vướng mắc</option>
-          </select>
-          <select class="filter-select" id="filterDept">
-            <option value="">Tất cả phòng ban</option>
-            <option value="Công nghệ thông tin">CNTT</option>
-            <option value="Kinh doanh">Kinh doanh</option>
-          </select>
-        </div>
-
-        <!-- Table -->
-        <div style="overflow-x:auto">
-          <table id="taskTable">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Tiêu đề</th>
-                <th>Người thực hiện</th>
-                <th>Quản lý</th>
-                <th>Tiến độ</th>
-                <th>Hạn chót</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody id="taskBody">
-              <% if (tasks.length === 0) { %>
-                <tr>
-                  <td colspan="8">
-                    <div class="empty-state">
-                      <i class="ti ti-clipboard-off"></i>
-                      Chưa có công việc nào
-                    </div>
-                  </td>
-                </tr>
-              <% } else { %>
-                <% tasks.forEach((task, index) => { %>
-                  <tr data-status="<%= task.status %>" data-dept="<%= task.assignee.department %>" data-title="<%= task.title.toLowerCase() %>">
-                    <td style="color:#94A3B8; font-size:12px"><%= index + 1 %></td>
-
-                    <td>
-                      <div style="font-weight:500; color:#0F172A; margin-bottom:2px"><%= task.title %></div>
-                      <% if (task.description) { %>
-                        <div style="font-size:11px; color:#94A3B8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px">
-                          <%= task.description %>
-                        </div>
-                      <% } %>
-                    </td>
-
-                    <td>
-                      <div class="assignee-cell">
-                        <div class="avatar-sm"><%= task.assignee.name.charAt(0) %></div>
-                        <span><%= task.assignee.name %></span>
-                      </div>
-                    </td>
-
-                    <td><%= task.manager.name %></td>
-
-                    <td>
-                      <div class="progress-bar-wrap">
-                        <div style="font-size:11px; color:#64748B; margin-bottom:4px"><%= task.progressPercent %>%</div>
-                        <div class="progress-bar-bg">
-                          <div class="progress-bar-fill" style="width:<%= task.progressPercent %>%"></div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td>
-                      <% const d = new Date(task.deadline); %>
-                      <% const isOverdue = d < new Date() && task.status !== 'Completed'; %>
-                      <span style="<%= isOverdue ? 'color:#EF4444; font-weight:500' : 'color:#334155' %>">
-                        <%= d.toLocaleDateString('vi-VN') %>
-                      </span>
-                    </td>
-
-                    <td>
-                      <% if (task.status === 'Pending') { %>
-                        <span class="badge badge-pending"><i class="ti ti-clock"></i> Chờ thực hiện</span>
-                      <% } else if (task.status === 'In Progress') { %>
-                        <span class="badge badge-progress"><i class="ti ti-loader"></i> Đang thực hiện</span>
-                      <% } else if (task.status === 'Completed') { %>
-                        <span class="badge badge-completed"><i class="ti ti-circle-check"></i> Hoàn thành</span>
-                      <% } else if (task.status === 'Stuck') { %>
-                        <span class="badge badge-stuck"><i class="ti ti-alert-triangle"></i> Vướng mắc</span>
-                      <% } %>
-                    </td>
-
-                    <td>
-                      <div class="action-btns">
-                        <a href="/api/tasks/<%= task.id %>/detail" class="btn-icon" title="Xem chi tiết">
-                          <i class="ti ti-eye"></i>
-                        </a>
-                        <a href="/api/tasks/<%= task.id %>/edit" class="btn-icon" title="Chỉnh sửa">
-                          <i class="ti ti-edit"></i>
-                        </a>
-                        <a href="/api/tasks/<%= task.id %>/progress" class="btn-icon" title="Cập nhật tiến độ">
-                          <i class="ti ti-trending-up"></i>
-                        </a>
-                        <button class="btn-icon danger" title="Xóa" onclick="deleteTask(<%= task.id %>)">
-                          <i class="ti ti-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                <% }) %>
-              <% } %>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination info -->
-        <div class="pagination">
-          <span class="page-info" id="pageInfo">Hiển thị <%= tasks.length %> công việc</span>
-          <div class="page-btns">
-            <button class="page-btn active">1</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── Search & Filter ──────────────────────────
-const searchInput  = document.getElementById('searchInput');
-const filterStatus = document.getElementById('filterStatus');
-const filterDept   = document.getElementById('filterDept');
-
-function applyFilter() {
-    const keyword = searchInput.value.toLowerCase();
-    const status  = filterStatus.value;
-    const dept    = filterDept.value;
-    const rows    = document.querySelectorAll('#taskBody tr[data-status]');
-    let count = 0;
-
-    rows.forEach(row => {
-        const matchTitle  = row.dataset.title.includes(keyword);
-        const matchStatus = !status || row.dataset.status === status;
-        const matchDept   = !dept   || row.dataset.dept   === dept;
-        const show = matchTitle && matchStatus && matchDept;
-        row.style.display = show ? '' : 'none';
-        if (show) count++;
-    });
-
-    document.getElementById('pageInfo').textContent = `Hiển thị ${count} công việc`;
-}
-
-searchInput.addEventListener('input', applyFilter);
-filterStatus.addEventListener('change', applyFilter);
-filterDept.addEventListener('change', applyFilter);
-
-// ── Delete ───────────────────────────────────
-async function deleteTask(id) {
-    if (!confirm('Bạn có chắc muốn xóa công việc này?')) return;
-    try {
-        const response = await fetch(`/api/tasks/${id}/delete`, { method: 'DELETE' });
-
-        //console.log('Status:', response.status); // ← xem terminal trả về status gì
-
-        if (response.status === 200) {
-            location.reload();
-        } else {
-            const data = await response.json();
-            alert('Xóa thất bại: ' + data.message);
+    <%- include('../partials/head', { title: 'Danh sách công việc' }) %>
+    <style>
+        /* ── Table ── */
+        .table-wrap {
+            background: #fff;
+            border-radius: 10px;
+            border: 1px solid #E2E8F0;
+            overflow: hidden;
         }
-    } catch (e) {
-        console.error(e);
-        alert('Lỗi kết nối server!');
-    }
-}
-</script>
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0F172A;
+        }
+
+        .btn-add {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #2563EB;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-add:hover {
+            background: #1D4ED8;
+        }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            padding: 12px 20px;
+            border-bottom: 1px solid #F1F5F9;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            height: 34px;
+            padding: 0 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: 7px;
+            font-size: 13px;
+            color: #334155;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            border-color: #2563EB;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #E2E8F0;
+            border-radius: 7px;
+            padding: 0 10px;
+            height: 34px;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            color: #334155;
+            width: 100%;
+            background: transparent;
+        }
+
+        .search-box i {
+            color: #94A3B8;
+            font-size: 16px;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 11px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            background: #F8FAFC;
+            border-bottom: 1px solid #E2E8F0;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background .15s;
+        }
+
+        tbody tr:hover {
+            background: #F8FAFC;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #334155;
+            border-bottom: 1px solid #F1F5F9;
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Avatar + name */
+        .assignee-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar-sm {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            background: #2563EB;
+            flex-shrink: 0;
+        }
+
+        /* Status badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-pending {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .badge-progress {
+            background: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        .badge-completed {
+            background: #EAF3DE;
+            color: #27500A;
+        }
+
+        .badge-stuck {
+            background: #FCEBEB;
+            color: #A32D2D;
+        }
+
+        /* Priority dot */
+        .progress-bar-wrap {
+            width: 80px;
+        }
+
+        .progress-bar-bg {
+            background: #E2E8F0;
+            border-radius: 4px;
+            height: 5px;
+        }
+
+        .progress-bar-fill {
+            height: 5px;
+            border-radius: 4px;
+            background: #2563EB;
+            transition: width .3s;
+        }
+
+        /* Action buttons */
+        .action-btns {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #E2E8F0;
+            background: #fff;
+            color: #64748B;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all .15s;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            border-color: #2563EB;
+            color: #2563EB;
+            background: #EFF6FF;
+        }
+
+        .btn-icon.danger:hover {
+            border-color: #EF4444;
+            color: #EF4444;
+            background: #FCEBEB;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #94A3B8;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .page-info {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .page-btns {
+            display: flex;
+            gap: 4px;
+        }
+
+        .page-btn {
+            height: 30px;
+            min-width: 30px;
+            padding: 0 8px;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            background: #fff;
+            color: #334155;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn.active {
+            background: #2563EB;
+            color: #fff;
+            border-color: #2563EB;
+        }
+
+        .page-btn:hover:not(.active) {
+            border-color: #2563EB;
+            color: #2563EB;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
+
+        <div class="main">
+            <%- include('../partials/topbar', { pageTitle: title, breadcrumb: 'Công việc / Danh sách' }) %>
+
+
+            <div class="content">
+                <div class="table-wrap">
+
+                    <!-- Header -->
+                    <div class="table-header">
+                        <span class="table-title">
+                            <i class="ti ti-checklist" style="color:#2563EB; margin-right:6px"></i>
+                            Tất cả công việc
+                            <span style="font-size:12px; color:#64748B; font-weight:400; margin-left:6px">(<%= tasks.length %> việc)</span>
+                        </span>
+                        <a href="/api/tasks/new" class="btn-add">
+                            <i class="ti ti-plus"></i> Giao việc mới
+                        </a>
+                    </div>
+
+                    <!-- Filter bar -->
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <i class="ti ti-search"></i>
+                            <input type="text" id="searchInput" placeholder="Tìm kiếm công việc...">
+                        </div>
+                        <select class="filter-select" id="filterStatus">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Pending">Chờ thực hiện</option>
+                            <option value="In Progress">Đang thực hiện</option>
+                            <option value="Completed">Hoàn thành</option>
+                            <option value="Stuck">Vướng mắc</option>
+                        </select>
+                        <select class="filter-select" id="filterDept">
+                            <option value="">Tất cả phòng ban</option>
+                            <option value="Công nghệ thông tin">CNTT</option>
+                            <option value="Kinh doanh">Kinh doanh</option>
+                        </select>
+                    </div>
+
+                    <!-- Table -->
+                    <div style="overflow-x:auto">
+                        <table id="taskTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Người thực hiện</th>
+                                    <th>Quản lý</th>
+                                    <th>Tiến độ</th>
+                                    <th>Hạn chót</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="taskBody">
+                                <% if (tasks.length === 0) { %>
+                                <tr>
+                                    <td colspan="8">
+                                        <div class="empty-state">
+                                            <i class="ti ti-clipboard-off"></i>
+                                            Chưa có công việc nào
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% } else { %>
+                                <% tasks.forEach((task, index) => { %>
+                                <tr data-status="<%= task.status %>" data-dept="<%= task.assignee.department %>" data-title="<%= task.title.toLowerCase() %>">
+                                    <td style="color:#94A3B8; font-size:12px"><%= index + 1 %></td>
+
+                                    <td>
+                                        <div style="font-weight:500; color:#0F172A; margin-bottom:2px"><%= task.title %></div>
+                                        <% if (task.description) { %>
+                                        <div style="font-size:11px; color:#94A3B8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:220px">
+                                            <%= task.description %>
+                                        </div>
+                                        <% } %>
+                                    </td>
+
+                                    <td>
+                                        <div class="assignee-cell">
+                                            <div class="avatar-sm"><%= task.assignee.name.charAt(0) %></div>
+                                            <span><%= task.assignee.name %></span>
+                                        </div>
+                                    </td>
+
+                                    <td><%= task.manager.name %></td>
+
+                                    <td>
+                                        <div class="progress-bar-wrap">
+                                            <div style="font-size:11px; color:#64748B; margin-bottom:4px"><%= task.progressPercent %>%</div>
+                                            <div class="progress-bar-bg">
+                                                <div class="progress-bar-fill" style="width:<%= task.progressPercent %>%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <% const d = new Date(task.deadline); %>
+                                        <% const isOverdue = d < new Date() && task.status !== 'Completed'; %>
+                                        <span style="<%= isOverdue ? 'color:#EF4444; font-weight:500' : 'color:#334155' %>">
+                                            <%= d.toLocaleDateString('vi-VN') %>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <% if (task.status === 'Pending') { %>
+                                        <span class="badge badge-pending"><i class="ti ti-clock"></i> Chờ thực hiện</span>
+                                        <% } else if (task.status === 'In Progress') { %>
+                                        <span class="badge badge-progress"><i class="ti ti-loader"></i> Đang thực hiện</span>
+                                        <% } else if (task.status === 'Completed') { %>
+                                        <span class="badge badge-completed"><i class="ti ti-circle-check"></i> Hoàn thành</span>
+                                        <% } else if (task.status === 'Stuck') { %>
+                                        <span class="badge badge-stuck"><i class="ti ti-alert-triangle"></i> Vướng mắc</span>
+                                        <% } %>
+                                    </td>
+
+                                    <td>
+                                        <div class="action-btns">
+                                            <a href="/api/tasks/<%= task.id %>/detail" class="btn-icon" title="Xem chi tiết">
+                                                <i class="ti ti-eye"></i>
+                                            </a>
+                                            <a href="/api/tasks/<%= task.id %>/edit" class="btn-icon" title="Chỉnh sửa">
+                                                <i class="ti ti-edit"></i>
+                                            </a>
+                                            <a href="/api/tasks/<%= task.id %>/progress" class="btn-icon" title="Cập nhật tiến độ">
+                                                <i class="ti ti-trending-up"></i>
+                                            </a>
+                                            <button class="btn-icon danger" title="Xóa" onclick="deleteTask(<%= task.id %>)">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination info -->
+                    <div class="pagination">
+                        <span class="page-info" id="pageInfo">Hiển thị <%= tasks.length %> công việc</span>
+                        <div class="page-btns">
+                            <button class="page-btn active">1</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Search & Filter ──────────────────────────
+        const searchInput = document.getElementById('searchInput');
+        const filterStatus = document.getElementById('filterStatus');
+        const filterDept = document.getElementById('filterDept');
+
+        function applyFilter() {
+            const keyword = searchInput.value.toLowerCase();
+            const status = filterStatus.value;
+            const dept = filterDept.value;
+            const rows = document.querySelectorAll('#taskBody tr[data-status]');
+            let count = 0;
+
+            rows.forEach(row => {
+                const matchTitle = row.dataset.title.includes(keyword);
+                const matchStatus = !status || row.dataset.status === status;
+                const matchDept = !dept || row.dataset.dept === dept;
+                const show = matchTitle && matchStatus && matchDept;
+                row.style.display = show ? '' : 'none';
+                if (show) count++;
+            });
+
+            document.getElementById('pageInfo').textContent = `Hiển thị ${count} công việc`;
+        }
+
+        searchInput.addEventListener('input', applyFilter);
+        filterStatus.addEventListener('change', applyFilter);
+        filterDept.addEventListener('change', applyFilter);
+
+        // ── Delete ───────────────────────────────────
+        async function deleteTask(id) {
+            if (!confirm('Bạn có chắc muốn xóa công việc này?')) return;
+            try {
+                const response = await fetch(`/api/tasks/${id}/delete`, {
+                    method: 'DELETE'
+                });
+
+                //console.log('Status:', response.status); // ← xem terminal trả về status gì
+
+                if (response.status === 200) {
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert('Xóa thất bại: ' + data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi kết nối server!');
+            }
+        }
+    </script>
 </body>
+
 </html>

@@ -1,332 +1,467 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <%- include('../partials/head') %>
-  <style>
-    .detail-wrap { max-width: 720px; margin: 0 auto; }
+    <%- include('../partials/head') %>
+    <style>
+        .detail-wrap {
+            max-width: 720px;
+            margin: 0 auto;
+        }
 
-    /* Header card */
-    .header-card {
-      background: #fff;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-    .task-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #0F172A;
-      margin-bottom: 12px;
-      line-height: 1.4;
-    }
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      font-size: 12px;
-      color: #64748B;
-    }
-    .meta-item { display: flex; align-items: center; gap: 5px; }
+        /* Header card */
+        .header-card {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+        }
 
-    /* Badge */
-    .badge { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
-    .badge-pending   { background:#F1F5F9; color:#475569; }
-    .badge-progress  { background:#EFF6FF; color:#1D4ED8; }
-    .badge-completed { background:#EAF3DE; color:#27500A; }
-    .badge-stuck     { background:#FCEBEB; color:#A32D2D; }
+        .task-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
 
-    /* Info grid */
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 16px;
-    }
-    .info-card {
-      background: #fff;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-    .info-card-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #64748B;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #F8FAFC;
-      font-size: 13px;
-    }
-    .info-row:last-child { border: none; padding-bottom: 0; }
-    .info-key { color: #64748B; }
-    .info-val { color: #0F172A; font-weight: 500; text-align: right; }
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 12px;
+            color: #64748B;
+        }
 
-    /* Progress card */
-    .progress-card {
-      background: #fff;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    .progress-label { font-size: 13px; font-weight: 600; color: #374151; }
-    .progress-pct   { font-size: 20px; font-weight: 700; color: #2563EB; }
-    .progress-bg    { background: #E2E8F0; border-radius: 6px; height: 8px; }
-    .progress-fill  { height: 8px; border-radius: 6px; background: #2563EB; transition: width .3s; }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-    /* People card */
-    .person-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid #F8FAFC;
-    }
-    .person-row:last-child { border: none; padding-bottom: 0; }
-    .avatar-circle {
-      width: 38px; height: 38px;
-      border-radius: 50%;
-      background: #2563EB;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 600; color: #fff;
-      flex-shrink: 0;
-    }
-    .person-name { font-size: 13px; font-weight: 500; color: #0F172A; }
-    .person-role { font-size: 11px; color: #64748B; margin-top: 1px; }
-    .person-badge {
-      margin-left: auto;
-      font-size: 11px; font-weight: 500;
-      padding: 2px 8px; border-radius: 4px;
-    }
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
 
-    /* Description card */
-    .desc-card {
-      background: #fff;
-      border: 1px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.05);
-    }
-    .desc-text {
-      font-size: 13px;
-      color: #374151;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
+        .badge-pending {
+            background: #F1F5F9;
+            color: #475569;
+        }
 
-    /* Action bar */
-    .action-bar {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-bottom: 24px;
-    }
-    .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; border:none; transition:all .15s; }
-    .btn-outline { background:#fff; color:#374151; border:1px solid #E2E8F0; }
-    .btn-outline:hover { border-color:#2563EB; color:#2563EB; }
-    .btn-primary { background:#2563EB; color:#fff; }
-    .btn-primary:hover { background:#1D4ED8; }
-    .btn-danger  { background:#fff; color:#EF4444; border:1px solid #FCA5A5; }
-    .btn-danger:hover { background:#FCEBEB; }
-  </style>
+        .badge-progress {
+            background: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        .badge-completed {
+            background: #EAF3DE;
+            color: #27500A;
+        }
+
+        .badge-stuck {
+            background: #FCEBEB;
+            color: #A32D2D;
+        }
+
+        /* Info grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .info-card {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+        }
+
+        .info-card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F8FAFC;
+            font-size: 13px;
+        }
+
+        .info-row:last-child {
+            border: none;
+            padding-bottom: 0;
+        }
+
+        .info-key {
+            color: #64748B;
+        }
+
+        .info-val {
+            color: #0F172A;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        /* Progress card */
+        .progress-card {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .progress-pct {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2563EB;
+        }
+
+        .progress-bg {
+            background: #E2E8F0;
+            border-radius: 6px;
+            height: 8px;
+        }
+
+        .progress-fill {
+            height: 8px;
+            border-radius: 6px;
+            background: #2563EB;
+            transition: width .3s;
+        }
+
+        /* People card */
+        .person-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #F8FAFC;
+        }
+
+        .person-row:last-child {
+            border: none;
+            padding-bottom: 0;
+        }
+
+        .avatar-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #2563EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .person-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #0F172A;
+        }
+
+        .person-role {
+            font-size: 11px;
+            color: #64748B;
+            margin-top: 1px;
+        }
+
+        .person-badge {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* Description card */
+        .desc-card {
+            background: #fff;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+        }
+
+        .desc-text {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* Action bar */
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all .15s;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #374151;
+            border: 1px solid #E2E8F0;
+        }
+
+        .btn-outline:hover {
+            border-color: #2563EB;
+            color: #2563EB;
+        }
+
+        .btn-primary {
+            background: #2563EB;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1D4ED8;
+        }
+
+        .btn-danger {
+            background: #fff;
+            color: #EF4444;
+            border: 1px solid #FCA5A5;
+        }
+
+        .btn-danger:hover {
+            background: #FCEBEB;
+        }
+    </style>
 </head>
+
 <body>
-<div class="app">
-  <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
+    <div class="app">
+        <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
 
-  <div class="main">
-    <%- include('../partials/topbar', { pageTitle: 'Chi tiết công việc', breadcrumb: 'Công việc / Chi tiết' }) %>
-    
-    <div class="content">
-      <div class="detail-wrap">
+        <div class="main">
+            <%- include('../partials/topbar', { pageTitle: 'Chi tiết công việc', breadcrumb: 'Công việc / Chi tiết' }) %>
 
-        <!-- Action buttons -->
-        <div class="action-bar">
-          <a href="/api/tasks/<%= task.id %>/progress" class="btn btn-outline">
-            <i class="ti ti-trending-up"></i> Cập nhật tiến độ
-          </a>
-          <a href="/api/tasks/<%= task.id %>/edit" class="btn btn-primary">
-            <i class="ti ti-edit"></i> Chỉnh sửa
-          </a>
-          <button class="btn btn-danger" onclick="deleteTask(<%= task.id %>)">
-            <i class="ti ti-trash"></i> Xóa
-          </button>
+            <div class="content">
+                <div class="detail-wrap">
+
+                    <!-- Action buttons -->
+                    <div class="action-bar">
+                        <a href="/api/tasks/<%= task.id %>/progress" class="btn btn-outline">
+                            <i class="ti ti-trending-up"></i> Cập nhật tiến độ
+                        </a>
+                        <a href="/api/tasks/<%= task.id %>/edit" class="btn btn-primary">
+                            <i class="ti ti-edit"></i> Chỉnh sửa
+                        </a>
+                        <button class="btn btn-danger" onclick="deleteTask(<%= task.id %>)">
+                            <i class="ti ti-trash"></i> Xóa
+                        </button>
+                    </div>
+
+                    <!-- Tiêu đề & meta -->
+                    <div class="header-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px">
+                            <div class="task-title"><%= task.title %></div>
+                            <%
+                                const badgeClass =
+                                    task.status === 'Pending'     ? 'badge-pending'   :
+                                    task.status === 'In Progress' ? 'badge-progress'  :
+                                    task.status === 'Completed'   ? 'badge-completed' : 'badge-stuck';
+                                const badgeIcon =
+                                    task.status === 'Pending'     ? 'ti-clock'         :
+                                    task.status === 'In Progress' ? 'ti-loader'        :
+                                    task.status === 'Completed'   ? 'ti-circle-check'  : 'ti-alert-triangle';
+                                const badgeLabel =
+                                    task.status === 'Pending'     ? 'Chờ thực hiện'    :
+                                    task.status === 'In Progress' ? 'Đang thực hiện'   :
+                                    task.status === 'Completed'   ? 'Hoàn thành'       : 'Vướng mắc';
+                                %>
+                            <span class="badge <%= badgeClass %>" style="flex-shrink:0">
+                                <i class="ti <%= badgeIcon %>"></i> <%= badgeLabel %>
+                            </span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-item">
+                                <i class="ti ti-tag"></i>
+                                <%= task.category ? task.category.name : 'Chưa phân loại' %>
+                            </span>
+                            <span class="meta-item">
+                                <i class="ti ti-calendar-plus"></i>
+                                Giao ngày: <%= new Date(task.assignedDate).toLocaleDateString('vi-VN') %>
+                            </span>
+                            <span class="meta-item" style="<%= new Date(task.deadline) < new Date() && task.status !== 'Completed' ? 'color:#EF4444; font-weight:500' : '' %>">
+                                <i class="ti ti-calendar-due"></i>
+                                Hạn chót: <%= new Date(task.deadline).toLocaleDateString('vi-VN') %>
+                                <% if (new Date(task.deadline) < new Date() && task.status !== 'Completed') { %>
+                                <span>(Quá hạn)</span>
+                                <% } %>
+                            </span>
+                            <% if (task.completedDate) { %>
+                            <span class="meta-item" style="color:#27500A">
+                                <i class="ti ti-circle-check"></i>
+                                Hoàn thành: <%= new Date(task.completedDate).toLocaleDateString('vi-VN') %>
+                            </span>
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- Tiến độ -->
+                    <div class="progress-card">
+                        <div class="progress-header">
+                            <span class="progress-label"><i class="ti ti-trending-up" style="color:#2563EB; margin-right:6px"></i>Tiến độ hoàn thành</span>
+                            <span class="progress-pct" style="color:<%= task.progressPercent === 100 ? '#27500A' : task.progressPercent >= 50 ? '#2563EB' : '#D97706' %>">
+                                <%= task.progressPercent %>%
+                            </span>
+                        </div>
+                        <div class="progress-bg">
+                            <div class="progress-fill" style="width:<%= task.progressPercent %>%;
+                                background:<%= task.progressPercent === 100 ? '#3B6D11' : task.progressPercent >= 50 ? '#2563EB' : '#D97706' %>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info grid -->
+                    <div class="info-grid">
+
+                        <!-- Thông tin chung -->
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="ti ti-info-circle" style="color:#2563EB"></i> Thông tin chung
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Danh mục</span>
+                                <span class="info-val"><%= task.category ? task.category.name : '—' %></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Trạng thái</span>
+                                <span class="info-val">
+                                    <span class="badge <%= badgeClass %>" style="font-size:11px"><%= badgeLabel %></span>
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-key">Tiến độ</span>
+                                <span class="info-val"><%= task.progressPercent %>%</span>
+                            </div>
+                            <% if (task.qualityRating) { %>
+                            <div class="info-row">
+                                <span class="info-key">Đánh giá</span>
+                                <span class="info-val">
+                                    <% for(let i=1; i<=5; i++) { %>
+                                    <i class="ti ti-star<%= i <= task.qualityRating ? '-filled' : '' %>" style="color:<%= i <= task.qualityRating ? '#F59E0B' : '#E2E8F0' %>; font-size:14px"></i>
+                                    <% } %>
+                                </span>
+                            </div>
+                            <% } %>
+                        </div>
+
+                        <!-- Nhân sự -->
+                        <div class="info-card">
+                            <div class="info-card-title">
+                                <i class="ti ti-users" style="color:#2563EB"></i> Nhân sự
+                            </div>
+                            <div class="person-row">
+                                <div class="avatar-circle" style="background:#7C3AED">
+                                    <%= task.assignee.name.charAt(0) %>
+                                </div>
+                                <div>
+                                    <div class="person-name"><%= task.assignee.name %></div>
+                                    <div class="person-role"><%= task.assignee.department || 'Chưa có phòng ban' %></div>
+                                </div>
+                                <span class="person-badge" style="background:#EFF6FF; color:#1D4ED8">Thực hiện</span>
+                            </div>
+                            <div class="person-row">
+                                <div class="avatar-circle" style="background:#1B2A4A">
+                                    <%= task.manager.name.charAt(0) %>
+                                </div>
+                                <div>
+                                    <div class="person-name"><%= task.manager.name %></div>
+                                    <div class="person-role"><%= task.manager.department || 'Quản lý' %></div>
+                                </div>
+                                <span class="person-badge" style="background:#EAF3DE; color:#27500A">Quản lý</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Mô tả -->
+                    <% if (task.description) { %>
+                    <div class="desc-card">
+                        <div class="info-card-title">
+                            <i class="ti ti-notes" style="color:#2563EB"></i> Mô tả công việc
+                        </div>
+                        <p class="desc-text"><%= task.description %></p>
+                    </div>
+                    <% } %>
+
+                </div>
+            </div>
         </div>
-
-        <!-- Tiêu đề & meta -->
-        <div class="header-card">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:10px">
-            <div class="task-title"><%= task.title %></div>
-            <%
-              const badgeClass =
-                task.status === 'Pending'     ? 'badge-pending'   :
-                task.status === 'In Progress' ? 'badge-progress'  :
-                task.status === 'Completed'   ? 'badge-completed' : 'badge-stuck';
-              const badgeIcon =
-                task.status === 'Pending'     ? 'ti-clock'         :
-                task.status === 'In Progress' ? 'ti-loader'        :
-                task.status === 'Completed'   ? 'ti-circle-check'  : 'ti-alert-triangle';
-              const badgeLabel =
-                task.status === 'Pending'     ? 'Chờ thực hiện'    :
-                task.status === 'In Progress' ? 'Đang thực hiện'   :
-                task.status === 'Completed'   ? 'Hoàn thành'       : 'Vướng mắc';
-            %>
-            <span class="badge <%= badgeClass %>" style="flex-shrink:0">
-              <i class="ti <%= badgeIcon %>"></i> <%= badgeLabel %>
-            </span>
-          </div>
-          <div class="meta-row">
-            <span class="meta-item">
-              <i class="ti ti-tag"></i>
-              <%= task.category ? task.category.name : 'Chưa phân loại' %>
-            </span>
-            <span class="meta-item">
-              <i class="ti ti-calendar-plus"></i>
-              Giao ngày: <%= new Date(task.assignedDate).toLocaleDateString('vi-VN') %>
-            </span>
-            <span class="meta-item" style="<%= new Date(task.deadline) < new Date() && task.status !== 'Completed' ? 'color:#EF4444; font-weight:500' : '' %>">
-              <i class="ti ti-calendar-due"></i>
-              Hạn chót: <%= new Date(task.deadline).toLocaleDateString('vi-VN') %>
-              <% if (new Date(task.deadline) < new Date() && task.status !== 'Completed') { %>
-                <span>(Quá hạn)</span>
-              <% } %>
-            </span>
-            <% if (task.completedDate) { %>
-            <span class="meta-item" style="color:#27500A">
-              <i class="ti ti-circle-check"></i>
-              Hoàn thành: <%= new Date(task.completedDate).toLocaleDateString('vi-VN') %>
-            </span>
-            <% } %>
-          </div>
-        </div>
-
-        <!-- Tiến độ -->
-        <div class="progress-card">
-          <div class="progress-header">
-            <span class="progress-label"><i class="ti ti-trending-up" style="color:#2563EB; margin-right:6px"></i>Tiến độ hoàn thành</span>
-            <span class="progress-pct" style="color:<%= task.progressPercent === 100 ? '#27500A' : task.progressPercent >= 50 ? '#2563EB' : '#D97706' %>">
-              <%= task.progressPercent %>%
-            </span>
-          </div>
-          <div class="progress-bg">
-            <div class="progress-fill"
-              style="width:<%= task.progressPercent %>%;
-                     background:<%= task.progressPercent === 100 ? '#3B6D11' : task.progressPercent >= 50 ? '#2563EB' : '#D97706' %>">
-            </div>
-          </div>
-        </div>
-
-        <!-- Info grid -->
-        <div class="info-grid">
-
-          <!-- Thông tin chung -->
-          <div class="info-card">
-            <div class="info-card-title">
-              <i class="ti ti-info-circle" style="color:#2563EB"></i> Thông tin chung
-            </div>
-            <div class="info-row">
-              <span class="info-key">Danh mục</span>
-              <span class="info-val"><%= task.category ? task.category.name : '—' %></span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Trạng thái</span>
-              <span class="info-val">
-                <span class="badge <%= badgeClass %>" style="font-size:11px"><%= badgeLabel %></span>
-              </span>
-            </div>
-            <div class="info-row">
-              <span class="info-key">Tiến độ</span>
-              <span class="info-val"><%= task.progressPercent %>%</span>
-            </div>
-            <% if (task.qualityRating) { %>
-            <div class="info-row">
-              <span class="info-key">Đánh giá</span>
-              <span class="info-val">
-                <% for(let i=1; i<=5; i++) { %>
-                  <i class="ti ti-star<%= i <= task.qualityRating ? '-filled' : '' %>"
-                     style="color:<%= i <= task.qualityRating ? '#F59E0B' : '#E2E8F0' %>; font-size:14px"></i>
-                <% } %>
-              </span>
-            </div>
-            <% } %>
-          </div>
-
-          <!-- Nhân sự -->
-          <div class="info-card">
-            <div class="info-card-title">
-              <i class="ti ti-users" style="color:#2563EB"></i> Nhân sự
-            </div>
-            <div class="person-row">
-              <div class="avatar-circle" style="background:#7C3AED">
-                <%= task.assignee.name.charAt(0) %>
-              </div>
-              <div>
-                <div class="person-name"><%= task.assignee.name %></div>
-                <div class="person-role"><%= task.assignee.department || 'Chưa có phòng ban' %></div>
-              </div>
-              <span class="person-badge" style="background:#EFF6FF; color:#1D4ED8">Thực hiện</span>
-            </div>
-            <div class="person-row">
-              <div class="avatar-circle" style="background:#1B2A4A">
-                <%= task.manager.name.charAt(0) %>
-              </div>
-              <div>
-                <div class="person-name"><%= task.manager.name %></div>
-                <div class="person-role"><%= task.manager.department || 'Quản lý' %></div>
-              </div>
-              <span class="person-badge" style="background:#EAF3DE; color:#27500A">Quản lý</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Mô tả -->
-        <% if (task.description) { %>
-        <div class="desc-card">
-          <div class="info-card-title">
-            <i class="ti ti-notes" style="color:#2563EB"></i> Mô tả công việc
-          </div>
-          <p class="desc-text"><%= task.description %></p>
-        </div>
-        <% } %>
-
-      </div>
     </div>
-  </div>
-</div>
 
-<script>
-async function deleteTask(id) {
-    if (!confirm('Bạn có chắc muốn xóa công việc này?')) return;
-    try {
-        const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
-        if (res.ok) window.location.href = '/api/tasks';
-        else alert('Xóa thất bại!');
-    } catch (e) {
-        alert('Lỗi kết nối server!');
-    }
-}
-</script>
+    <script>
+        async function deleteTask(id) {
+            if (!confirm('Bạn có chắc muốn xóa công việc này?')) return;
+            try {
+                const res = await fetch(`/api/tasks/${id}`, {
+                    method: 'DELETE'
+                });
+                if (res.ok) window.location.href = '/api/tasks';
+                else alert('Xóa thất bại!');
+            } catch (e) {
+                alert('Lỗi kết nối server!');
+            }
+        }
+    </script>
 </body>
+
 </html>

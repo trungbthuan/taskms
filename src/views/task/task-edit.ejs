@@ -1,290 +1,410 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <%- include('../partials/head') %>
-  <style>
-    .form-card {
-      max-width: 680px; margin: 0 auto;
-      background: #fff; padding: 24px;
-      border-radius: 12px; border: 1px solid #E2E8F0;
-      box-shadow: 0 1px 3px rgba(0,0,0,.06);
-    }
-    .form-title {
-      font-size: 17px; font-weight: 700; color: #0F172A;
-      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
-      padding-bottom: 16px; border-bottom: 1px solid #F1F5F9;
-    }
-    .form-group { margin-bottom: 16px; }
-    .form-label {
-      display: block; font-size: 12px; font-weight: 600;
-      color: #374151; margin-bottom: 6px;
-      text-transform: uppercase; letter-spacing: .04em;
-    }
-    .form-control {
-      width: 100%; height: 40px; padding: 0 12px;
-      border: 1px solid #E2E8F0; border-radius: 8px;
-      font-size: 13px; color: #0F172A;
-      background: #fff; outline: none;
-      transition: border-color .15s, box-shadow .15s;
-      font-family: inherit;
-    }
-    .form-control:focus {
-      border-color: #2563EB;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-    }
-    textarea.form-control { height: auto; padding: 10px 12px; resize: none; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-
-    /* Status radio */
-    .status-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
-    .status-radio { display: none; }
-    .status-label-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px 12px; border-radius: 8px;
-      border: 1.5px solid #E2E8F0;
-      cursor: pointer; font-size: 13px; font-weight: 500;
-      transition: all .15s; color: #374151;
-    }
-    .status-radio:checked + .status-label-btn { background: #F8FAFC; }
-    #s-pending:checked   + .status-label-btn { border-color:#94A3B8; color:#475569; }
-    #s-progress:checked  + .status-label-btn { border-color:#2563EB; color:#1D4ED8; }
-    #s-completed:checked + .status-label-btn { border-color:#3B6D11; color:#27500A; }
-    #s-stuck:checked     + .status-label-btn { border-color:#EF4444; color:#A32D2D; }
-    .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-
-    /* Progress */
-    .range-wrap { display:flex; align-items:center; gap:12px; }
-    input[type=range] {
-      flex:1; height:5px; border-radius:4px;
-      accent-color: #2563EB; cursor:pointer;
-    }
-    .range-val {
-      width: 46px; height: 32px; text-align:center;
-      border: 1px solid #E2E8F0; border-radius:6px;
-      font-size:13px; font-weight:600; color:#2563EB;
-      display:flex; align-items:center; justify-content:center;
-    }
-
-    /* Buttons */
-    .form-actions { display:flex; justify-content:flex-end; gap:10px; padding-top:16px; border-top:1px solid #F1F5F9; margin-top:4px; }
-    .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; border:none; font-family:inherit; transition:all .15s; }
-    .btn-outline { background:#fff; color:#374151; border:1px solid #E2E8F0; }
-    .btn-outline:hover { border-color:#2563EB; color:#2563EB; }
-    .btn-primary { background:#2563EB; color:#fff; }
-    .btn-primary:hover { background:#1D4ED8; }
-  </style>
-</head>
-<body>
-<div class="app">
-  <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
-
-  <div class="main">
-    <%- include('../partials/topbar', { pageTitle: 'Chỉnh sửa công việc', breadcrumb: 'Công việc / Chỉnh sửa' }) %>
-
-    <div class="content">
-      <div class="form-card">
-        <div class="form-title">
-          <i class="ti ti-edit" style="color:#2563EB"></i>
-          Chỉnh sửa: <%= task.title %>
-        </div>
-
-        <form action="/api/tasks/<%= task.id %>/edit" method="POST">
-
-          <!-- Tiêu đề -->
-          <div class="form-group">
-            <label class="form-label">Danh mục nhóm công việc</label>
-            <select name="categoryId" id="categorySelect" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                <option value="">-- Chọn danh mục --</option>
-                <% categories.forEach(cat => { %>
-                  <option value="<%= cat.id %>" <%= task.categoryId === cat.id ? 'selected' : '' %>>
-                    <%= cat.name %>
-                  </option>
-                <% }) %>
-            </select>  
-          </div>
-
-          <!-- Danh mục & Nhân viên -->
-          <div class="form-grid">
-            <div class="form-group">
-              <!-- <label class="form-label">Tiêu đề công việc</label>
-              <input type="text" name="title" required class="form-control" value="<%= task.title %>"> -->
-              
-              <!-- Danh mục công việc — chọn sẵn đúng job theo task.title -->
-              <label class="form-label">Danh mục công việc</label>
-              <select name="jobTitle" id="jobTitle" class="form-control">
-                <option value="">-- Chọn công việc --</option>
-                <% jobs.forEach(job => { %>
-                  <option value="<%= job.title %>"
-                          data-category="<%= job.categoryId %>"
-                          data-description="<%= job.description %>"
-                          <%= task.title === job.title ? 'selected' : '' %>> 
-                    <%= job.title %>
-                  </option>
-                <% }) %>
-              </select>
-
-            </div>
-            <div class="form-group">
-              <label class="form-label">Nhân viên thực hiện</label>
-              <select name="assigneeId" required class="form-control">
-                <% employees.forEach(emp => { %>
-                  <option value="<%= emp.id %>"
-                    <%= task.assigneeId === emp.id ? 'selected' : '' %>>
-                    <%= emp.name %>
-                  </option>
-                <% }) %>
-              </select>
-            </div>
-          </div>
-
-          <!-- Quản lý & Deadline -->
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label">Quản lý</label>
-              <select name="managerId" required class="form-control">
-                <% managers.forEach(mgr => { %>
-                  <option value="<%= mgr.id %>"
-                    <%= task.managerId === mgr.id ? 'selected' : '' %>>
-                    <%= mgr.name %>
-                  </option>
-                <% }) %>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Hạn chót</label>
-              <input type="date" name="deadline" required class="form-control"
-                value="<%= deadlineFormatted %>">
-            </div>
-          </div>
-
-          <!-- Trạng thái -->
-          <div class="form-group">
-            <label class="form-label">Trạng thái</label>
-            <div class="status-grid">
-              <div>
-                <input type="radio" name="status" value="Pending" id="s-pending" class="status-radio"
-                  <%= task.status === 'Pending' ? 'checked' : '' %>>
-                <label for="s-pending" class="status-label-btn">
-                  <span class="status-dot" style="background:#94A3B8"></span> Chờ thực hiện
-                </label>
-              </div>
-              <div>
-                <input type="radio" name="status" value="In Progress" id="s-progress" class="status-radio"
-                  <%= task.status === 'In Progress' ? 'checked' : '' %>>
-                <label for="s-progress" class="status-label-btn">
-                  <span class="status-dot" style="background:#2563EB"></span> Đang thực hiện
-                </label>
-              </div>
-              <div>
-                <input type="radio" name="status" value="Completed" id="s-completed" class="status-radio"
-                  <%= task.status === 'Completed' ? 'checked' : '' %>>
-                <label for="s-completed" class="status-label-btn">
-                  <span class="status-dot" style="background:#3B6D11"></span> Hoàn thành
-                </label>
-              </div>
-              <div>
-                <input type="radio" name="status" value="Stuck" id="s-stuck" class="status-radio"
-                  <%= task.status === 'Stuck' ? 'checked' : '' %>>
-                <label for="s-stuck" class="status-label-btn">
-                  <span class="status-dot" style="background:#EF4444"></span> Vướng mắc
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tiến độ -->
-          <div class="form-group">
-            <label class="form-label">Tiến độ</label>
-            <div class="range-wrap">
-              <input type="range" name="progressPercent" id="progressRange"
-                min="0" max="100" step="5"
-                value="<%= task.progressPercent %>">
-              <div class="range-val" id="rangeVal"><%= task.progressPercent %>%</div>
-            </div>
-          </div>
-
-          <!-- Mô tả -->
-          <div class="form-group">
-            <label class="form-label">Mô tả chi tiết</label>
-            <textarea name="description" id="description" rows="4" class="form-control"
-              placeholder="Nội dung công việc..."><%= task.description || '' %></textarea>
-          </div>
-
-          <!-- Buttons -->
-          <div class="form-actions">
-            <a href="/api/tasks/<%= task.id %>/edit" class="btn btn-outline">
-              <i class="ti ti-x"></i> Hủy
-            </a>
-            <button type="submit" class="btn btn-primary">
-              <i class="ti ti-device-floppy"></i> Lưu thay đổi
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-  <script>
-    const range = document.getElementById('progressRange');
-    const val   = document.getElementById('rangeVal');
-    const jobSelect = document.getElementById("jobTitle");
-    const descriptionSelect = document.getElementById("description");
-
-    range.addEventListener('input', function() {
-        val.textContent = this.value + '%';
-
-        // Tự động đổi status theo tiến độ
-        if (Number(this.value) === 100) {
-            document.getElementById('s-completed').checked = true;
-        } else if (Number(this.value) === 0) {
-            document.getElementById('s-pending').checked = true;
-        } else {
-            document.getElementById('s-progress').checked = true;
+    <%- include('../partials/head') %>
+    <style>
+        .form-card {
+            max-width: 680px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
         }
-    });
 
-// Khi chọn danh mục → lọc công việc tương ứng
-    document.getElementById('categorySelect').addEventListener('change', function() {
-        const selectedCategoryId = this.value;
-        const jobOptions = document.querySelectorAll('#jobTitle option[data-category]');
+        .form-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0F172A;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #F1F5F9;
+        }
 
-        jobOptions.forEach(option => {
-            if (!selectedCategoryId || option.dataset.category === selectedCategoryId) {
-                option.style.display = '';
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 40px;
+            padding: 0 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #0F172A;
+            background: #fff;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+        }
+
+        textarea.form-control {
+            height: auto;
+            padding: 10px 12px;
+            resize: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        /* Status radio */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .status-radio {
+            display: none;
+        }
+
+        .status-label-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #E2E8F0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all .15s;
+            color: #374151;
+        }
+
+        .status-radio:checked+.status-label-btn {
+            background: #F8FAFC;
+        }
+
+        #s-pending:checked+.status-label-btn {
+            border-color: #94A3B8;
+            color: #475569;
+        }
+
+        #s-progress:checked+.status-label-btn {
+            border-color: #2563EB;
+            color: #1D4ED8;
+        }
+
+        #s-completed:checked+.status-label-btn {
+            border-color: #3B6D11;
+            color: #27500A;
+        }
+
+        #s-stuck:checked+.status-label-btn {
+            border-color: #EF4444;
+            color: #A32D2D;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Progress */
+        .range-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        input[type=range] {
+            flex: 1;
+            height: 5px;
+            border-radius: 4px;
+            accent-color: #2563EB;
+            cursor: pointer;
+        }
+
+        .range-val {
+            width: 46px;
+            height: 32px;
+            text-align: center;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 1px solid #F1F5F9;
+            margin-top: 4px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            font-family: inherit;
+            transition: all .15s;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #374151;
+            border: 1px solid #E2E8F0;
+        }
+
+        .btn-outline:hover {
+            border-color: #2563EB;
+            color: #2563EB;
+        }
+
+        .btn-primary {
+            background: #2563EB;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1D4ED8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <%- include('../partials/sidebar', { page: 'tasks', user: user }) %>
+
+        <div class="main">
+            <%- include('../partials/topbar', { pageTitle: 'Chỉnh sửa công việc', breadcrumb: 'Công việc / Chỉnh sửa' }) %>
+
+            <div class="content">
+                <div class="form-card">
+                    <div class="form-title">
+                        <i class="ti ti-edit" style="color:#2563EB"></i>
+                        Chỉnh sửa: <%= task.title %>
+                    </div>
+
+                    <form action="/api/tasks/<%= task.id %>/edit" method="POST">
+
+                        <!-- Tiêu đề -->
+                        <div class="form-group">
+                            <label class="form-label">Danh mục nhóm công việc</label>
+                            <select name="categoryId" id="categorySelect" class="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                <option value="">-- Chọn danh mục --</option>
+                                <% categories.forEach(cat => { %>
+                                <option value="<%= cat.id %>" <%= task.categoryId === cat.id ? 'selected' : '' %>>
+                                    <%= cat.name %>
+                                </option>
+                                <% }) %>
+                            </select>
+                        </div>
+
+                        <!-- Danh mục & Nhân viên -->
+                        <div class="form-grid">
+                            <div class="form-group">
+
+                                <!-- Danh mục công việc — chọn sẵn đúng job theo task.title -->
+                                <label class="form-label">Danh mục công việc</label>
+                                <select name="jobTitle" id="jobTitle" class="form-control">
+                                    <option value="">-- Chọn công việc --</option>
+                                    <% jobs.forEach(job => { %>
+                                    <option value="<%= job.title %>" data-category="<%= job.categoryId %>" data-description="<%= job.description %>" <%= task.title === job.title ? 'selected' : '' %>>
+                                        <%= job.title %>
+                                    </option>
+                                    <% }) %>
+                                </select>
+
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nhân viên thực hiện</label>
+                                <select name="assigneeId" required class="form-control">
+                                    <% employees.forEach(emp => { %>
+                                    <option value="<%= emp.id %>" <%= task.assigneeId === emp.id ? 'selected' : '' %>>
+                                        <%= emp.name %>
+                                    </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Quản lý & Deadline -->
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Quản lý</label>
+                                <select name="managerId" required class="form-control">
+                                    <% managers.forEach(mgr => { %>
+                                    <option value="<%= mgr.id %>" <%= task.managerId === mgr.id ? 'selected' : '' %>>
+                                        <%= mgr.name %>
+                                    </option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Hạn chót</label>
+                                <input type="date" name="deadline" required class="form-control" value="<%= deadlineFormatted %>">
+                            </div>
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="form-group">
+                            <label class="form-label">Trạng thái</label>
+                            <div class="status-grid">
+                                <div>
+                                    <input type="radio" name="status" value="Pending" id="s-pending" class="status-radio" <%= task.status === 'Pending' ? 'checked' : '' %>>
+                                    <label for="s-pending" class="status-label-btn">
+                                        <span class="status-dot" style="background:#94A3B8"></span> Chờ thực hiện
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="status" value="In Progress" id="s-progress" class="status-radio" <%= task.status === 'In Progress' ? 'checked' : '' %>>
+                                    <label for="s-progress" class="status-label-btn">
+                                        <span class="status-dot" style="background:#2563EB"></span> Đang thực hiện
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="status" value="Completed" id="s-completed" class="status-radio" <%= task.status === 'Completed' ? 'checked' : '' %>>
+                                    <label for="s-completed" class="status-label-btn">
+                                        <span class="status-dot" style="background:#3B6D11"></span> Hoàn thành
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="status" value="Stuck" id="s-stuck" class="status-radio" <%= task.status === 'Stuck' ? 'checked' : '' %>>
+                                    <label for="s-stuck" class="status-label-btn">
+                                        <span class="status-dot" style="background:#EF4444"></span> Vướng mắc
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tiến độ -->
+                        <div class="form-group">
+                            <label class="form-label">Tiến độ</label>
+                            <div class="range-wrap">
+                                <input type="range" name="progressPercent" id="progressRange" min="0" max="100" step="5" value="<%= task.progressPercent %>">
+                                <div class="range-val" id="rangeVal"><%= task.progressPercent %>%</div>
+                            </div>
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="form-group">
+                            <label class="form-label">Mô tả chi tiết</label>
+                            <textarea name="description" id="description" rows="4" class="form-control" placeholder="Nội dung công việc..."><%= task.description || '' %></textarea>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="form-actions">
+                            <a href="/api/tasks/<%= task.id %>/edit" class="btn btn-outline">
+                                <i class="ti ti-x"></i> Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-device-floppy"></i> Lưu thay đổi
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const range = document.getElementById('progressRange');
+        const val = document.getElementById('rangeVal');
+        const jobSelect = document.getElementById("jobTitle");
+        const descriptionSelect = document.getElementById("description");
+
+        range.addEventListener('input', function() {
+            val.textContent = this.value + '%';
+
+            // Tự động đổi status theo tiến độ
+            if (Number(this.value) === 100) {
+                document.getElementById('s-completed').checked = true;
+            } else if (Number(this.value) === 0) {
+                document.getElementById('s-pending').checked = true;
             } else {
-                option.style.display = 'none';
+                document.getElementById('s-progress').checked = true;
             }
         });
-        // Reset job select
-        document.getElementById('jobTitle').value = '';
-        document.getElementById('description').value = '';
-    });
-    
-    // Khi người dùng chọn một công việc, tự động điền mô tả tương ứng
-    jobSelect.addEventListener("change", (event) => {
-      const selectedOption = event.target.options[event.target.selectedIndex];
-      descriptionSelect.value = selectedOption.dataset.description || '';
-    });
 
-    // Khi trang load — điền sẵn description theo job đang chọn (xem lại sau)
-    // window.addEventListener('DOMContentLoaded', () => {
-    //     const selectedJob = jobSelect.options[jobSelect.selectedIndex];
-    //     if (selectedJob && selectedJob.dataset.description) {
-    //         descriptionSelect.value = selectedJob.dataset.description;
-    //     }
+        // Khi chọn danh mục → lọc công việc tương ứng
+        document.getElementById('categorySelect').addEventListener('change', function() {
+            const selectedCategoryId = this.value;
+            const jobOptions = document.querySelectorAll('#jobTitle option[data-category]');
 
-    //     // Hiển thị đúng jobs theo category đang chọn
-    //     const currentCategory = document.getElementById('categorySelect').value;
-    //     if (currentCategory) {
-    //         document.querySelectorAll('#jobTitle option[data-category]').forEach(opt => {
-    //             opt.style.display =
-    //                 opt.dataset.category === currentCategory ? '' : 'none';
-    //         });
-    //     }
-    // });
-  </script>
+            jobOptions.forEach(option => {
+                if (!selectedCategoryId || option.dataset.category === selectedCategoryId) {
+                    option.style.display = '';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
+            // Reset job select
+            document.getElementById('jobTitle').value = '';
+            document.getElementById('description').value = '';
+        });
+
+        // Khi người dùng chọn một công việc, tự động điền mô tả tương ứng
+        jobSelect.addEventListener("change", (event) => {
+            const selectedOption = event.target.options[event.target.selectedIndex];
+            descriptionSelect.value = selectedOption.dataset.description || '';
+        });
+
+        // Khi trang load — điền sẵn description theo job đang chọn (xem lại sau)
+        // window.addEventListener('DOMContentLoaded', () => {
+        //     const selectedJob = jobSelect.options[jobSelect.selectedIndex];
+        //     if (selectedJob && selectedJob.dataset.description) {
+        //         descriptionSelect.value = selectedJob.dataset.description;
+        //     }
+
+        //     // Hiển thị đúng jobs theo category đang chọn
+        //     const currentCategory = document.getElementById('categorySelect').value;
+        //     if (currentCategory) {
+        //         document.querySelectorAll('#jobTitle option[data-category]').forEach(opt => {
+        //             opt.style.display =
+        //                 opt.dataset.category === currentCategory ? '' : 'none';
+        //         });
+        //     }
+        // });
+    </script>
 </body>
+
 </html>
