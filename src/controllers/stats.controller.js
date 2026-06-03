@@ -76,11 +76,14 @@ export const getStats = async (req, res) => {
 
         // ── 4. Top nhân viên hiệu suất cao ──────────
         const topEmployees = await prisma.employee.findMany({
-            take: 5,
+            take: 10,
             include: {
                 tasks: {
-                    where: { ...roleFilter },
+                    where: roleFilter,
                     select: { status: true, progressPercent: true },
+                },
+                departmentRel: {
+                    select: { name: true },
                 },
             },
             orderBy: { name: 'asc' },
@@ -101,9 +104,13 @@ export const getStats = async (req, res) => {
                               ) / total,
                           )
                         : 0;
+
                 return {
                     name: emp.name,
-                    department: emp.department || 'Chưa phân phòng',
+                    department:
+                        emp.departmentRel?.name ||
+                        emp.department ||
+                        'Chưa phân phòng',
                     total,
                     completed,
                     rate: total > 0 ? Math.round((completed / total) * 100) : 0,

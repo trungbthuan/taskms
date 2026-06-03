@@ -1,4 +1,4 @@
 Bước tiếp theo bạn muốn học gì?
 
-📊 Thống kê nâng cao — biểu đồ theo tháng/phòng ban
-🚀 Deploy — đưa project lên server thật
+Chúng ta học tiếp. 
+Do tôi là người mới học nên diều kiện không có, bạn giúp tôi Deploy — đưa project lên server local
