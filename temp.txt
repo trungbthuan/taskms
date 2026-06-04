@@ -1,4 +1,12 @@
-Bước tiếp theo bạn muốn học gì?
+Tạo file start.bat trong thư mục project:
+batch@echo off
+title TaskFlow Server
+cd /d E:\VSCode\learn\nodejs\task-management
+echo Dang khoi dong TaskFlow...
+node server.js
+pause
 
-Chúng ta học tiếp. 
-Do tôi là người mới học nên diều kiện không có, bạn giúp tôi Deploy — đưa project lên server local
+Đặt shortcut file này vào:
+Windows + R → shell:startup → Enter
+
+Mỗi khi Windows khởi động, TaskFlow sẽ tự chạy!

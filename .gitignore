@@ -1,4 +1,21 @@
-/node_modules
-# Keep environment variables out of version control
-.env
+# Ignore the following files and directories
+
 /src/generated/prisma
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
