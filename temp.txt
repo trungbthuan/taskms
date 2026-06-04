@@ -1,3 +1,22 @@
+Deloy trên máy local
+
+Chạy lần đầu
+Mở PowerShell hoặc CMD trong thư mục project:
+# 1. Cài dependencies
+npm install
+
+# 2. Generate Prisma Client
+npx prisma generate
+
+# 3. Chạy migration (tạo bảng trong DB)
+npx prisma migrate deploy
+
+# 4. Chạy seed nếu cần dữ liệu mẫu
+node prisma/seed.js
+
+# 5. Khởi động server
+npm start
+
 Tạo file start.bat trong thư mục project:
 batch@echo off
 title TaskFlow Server
