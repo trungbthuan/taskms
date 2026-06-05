@@ -1,17 +1,17 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { prisma } from '../config/prisma.js';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { prisma } from "../config/prisma.js";
 
 // ====================== test ======================
 export const testPage = async (req, res) => {
     try {
-        res.render('../views/temp/temp', {
-            title: 'Trang dùng để test',
-            message: 'Đang test thành công',
+        res.render("../views/temp/temp", {
+            title: "Trang dùng để test",
+            message: "Đang test thành công",
             user: req.user,
         });
     } catch (error) {
-        res.status(500).json({ message: 'Lỗi server', error: error.message });
+        res.status(500).json({ message: "Lỗi server", error: error.message });
     }
 };
 
@@ -22,14 +22,10 @@ export const register = async (req, res) => {
 
         // Validate input
         if (!username || !email || !password) {
-            return res
-                .status(400)
-                .json({ message: 'Vui lòng điền đầy đủ thông tin' });
+            return res.status(400).json({ message: "Vui lòng điền đầy đủ thông tin" });
         }
         if (password.length < 8) {
-            return res
-                .status(400)
-                .json({ message: 'Mật khẩu phải có ít nhất 8 ký tự' });
+            return res.status(400).json({ message: "Mật khẩu phải có ít nhất 8 ký tự" });
         }
 
         // Kiểm tra username đã tồn tại chưa
@@ -38,10 +34,8 @@ export const register = async (req, res) => {
         });
 
         if (existing) {
-            const field = existing.username === username ? 'Username' : 'Email';
-            return res
-                .status(409)
-                .json({ message: `${field} đã được sử dụng` });
+            const field = existing.username === username ? "Username" : "Email";
+            return res.status(409).json({ message: `${field} đã được sử dụng` });
         }
 
         // Hash password
@@ -53,10 +47,10 @@ export const register = async (req, res) => {
         });
 
         // Redirect sang trang login
-        res.redirect('login?registered=true');
+        res.redirect("login?registered=true");
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Lỗi server' });
+        res.status(500).json({ message: "Lỗi server" });
     }
 };
 
@@ -66,9 +60,7 @@ export const login = async (req, res) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
-            return res
-                .status(400)
-                .json({ message: 'Vui lòng điền đầy đủ thông tin' });
+            return res.status(400).json({ message: "Vui lòng điền đầy đủ thông tin" });
         }
 
         // Tìm user theo username
@@ -77,17 +69,13 @@ export const login = async (req, res) => {
         });
 
         if (!user) {
-            return res
-                .status(401)
-                .json({ message: 'Username hoặc mật khẩu không đúng' });
+            return res.status(401).json({ message: "Username hoặc mật khẩu không đúng" });
         }
 
         // So sánh password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res
-                .status(401)
-                .json({ message: 'Username hoặc mật khẩu không đúng' });
+            return res.status(401).json({ message: "Username hoặc mật khẩu không đúng" });
         }
 
         // Cập nhật lastLoginAt
@@ -97,36 +85,32 @@ export const login = async (req, res) => {
         });
 
         // Tạo JWT token & lưu vào cookie
-        const token = jwt.sign(
-            { userId: user.id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRES_IN },
-        );
+        const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
 
-        res.cookie('token', token, {
+        res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
+            secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         // Loại bỏ password trước khi truyền vào view
         const { password: _, ...safeUser } = user;
-        res.redirect('/api/tasks/dashboard');
+        res.redirect("/api/tasks/dashboard");
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Lỗi server' });
+        res.status(500).json({ message: "Lỗi server" });
     }
 };
 
 export const getLogin = async (req, res) => {
-    res.render('../views/auth/login', { title: 'Đăng Nhập' });
+    res.render("../views/auth/login", { title: "Đăng Nhập" });
 };
 
 export const getRegister = async (req, res) => {
-    res.render('../views/auth/register', { title: 'Đăng Ký' });
+    res.render("../views/auth/register", { title: "Đăng Ký" });
 };
 
 export const logout = async (req, res) => {
-    res.clearCookie('token');
-    res.redirect('/api/auth/login?logout=true');
+    res.clearCookie("token");
+    res.redirect("/api/auth/login?logout=true");
 };
